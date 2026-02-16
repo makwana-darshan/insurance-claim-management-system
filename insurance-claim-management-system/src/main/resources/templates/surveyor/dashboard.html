@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Surveyor Dashboard</title>
+	<style>
+		table {
+			border-collapse: collapse;
+			width: 100%;
+		}
+
+		th,
+		td {
+			padding: 10px;
+			border: 1px solid #ccc;
+		}
+
+		th {
+			background: #f3f3f3;
+		}
+	</style>
+</head>
+
+<body>
+
+	<h2>Surveyor Dashboard</h2>
+
+	<table>
+		<tr>
+			<th>Claim ID</th>
+			<th>Policy</th>
+			<th>Type</th>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Action</th>
+		</tr>
+
+		<tr th:each="claim : ${claims}">
+			<td th:text="${claim.id}"></td>
+			<td th:text="${claim.policyNumber}"></td>
+			<td th:text="${claim.claimType}"></td>
+			<td th:text="${claim.claimAmount}"></td>
+			<td th:text="${claim.status}"></td>
+			<td>
+				<form th:if="${claim.status.name() == 'UNDER_REVIEW'}"
+					th:action="@{/surveyor/inspect/{id}(id=${claim.id})}" method="post">
+					<button type="submit">Mark Inspected</button>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<form th:action="@{/logout}" method="post">
+		<button type="submit">Logout</button>
+	</form>
+
+</body>
+
+</html>

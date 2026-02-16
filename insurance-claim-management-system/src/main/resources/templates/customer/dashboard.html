@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Customer Dashboard</title>
+</head>
+
+<body>
+
+	<h2>Customer Dashboard</h2>
+
+	<a href="/customer/claims/new">Create Claim</a>
+
+	<table border="1" cellpadding="10">
+		<tr>
+			<th>Policy</th>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Action</th>
+		</tr>
+
+		<tr th:each="claim : ${claims}">
+			<td th:text="${claim.policyNumber}"></td>
+			<td th:text="${claim.claimAmount}"></td>
+			<td th:text="${claim.status}"></td>
+
+			<td>
+				<form th:if="${claim.status.name() == 'DRAFT'}"
+					th:action="@{/customer/claims/submit/{id}(id=${claim.id})}" method="post">
+					<button type="submit">Submit</button>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+	<form th:action="@{/logout}" method="post">
+		<button type="submit">Logout</button>
+	</form>
+
+</body>
+
+</html>

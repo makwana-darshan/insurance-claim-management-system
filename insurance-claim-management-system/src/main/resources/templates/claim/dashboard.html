@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<title>Claim Officer Dashboard</title>
+</head>
+
+<body>
+
+	<h2>Claim Officer Dashboard</h2>
+
+	<table border="1">
+		<tr>
+			<th>Policy</th>
+			<th>Amount</th>
+			<th>Status</th>
+			<th>Assign Surveyor</th>
+		</tr>
+
+		<tr th:each="claim : ${claims}">
+			<td th:text="${claim.policyNumber}"></td>
+			<td th:text="${claim.claimAmount}"></td>
+			<td th:text="${claim.status}"></td>
+
+			<td>
+				<form th:action="@{/claim/assign/{id}(id=${claim.id})}" method="post">
+					<select name="surveyorId">
+						<option th:each="s : ${surveyors}" th:value="${s.id}" th:text="${s.email}">
+						</option>
+					</select>
+					<button type="submit">Assign</button>
+				</form>
+			</td>
+		</tr>
+	</table>
+
+</body>
+
+</html>
