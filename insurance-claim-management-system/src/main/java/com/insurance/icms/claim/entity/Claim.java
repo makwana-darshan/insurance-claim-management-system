@@ -23,6 +23,9 @@ public class Claim {
 	@Column(nullable = false)
 	private Double claimAmount;
 
+	@Column(length = 1000)
+	private String description;
+
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private ClaimStatus status;
@@ -119,6 +122,14 @@ public class Claim {
 
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 
 }

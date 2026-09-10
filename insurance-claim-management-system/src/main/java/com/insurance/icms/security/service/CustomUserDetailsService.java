@@ -1,6 +1,5 @@
 package com.insurance.icms.security.service;
 
-import com.insurance.icms.security.entity.Role;
 import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.repository.UserRepository;
 import org.springframework.security.core.userdetails.*;
@@ -21,8 +20,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-		return org.springframework.security.core.userdetails.User.withUsername(user.getEmail())
-				.password(user.getPassword())
-				.authorities(user.getRoles().stream().map(Role::getRoleName).toArray(String[]::new)).build();
+		return new CustomUserDetails(user);
 	}
 }
