@@ -1,11 +1,11 @@
 package com.insurance.icms.claim.service;
 
+import com.insurance.icms.claim.dto.ClaimRequestDto;
 import com.insurance.icms.claim.entity.Claim;
 import com.insurance.icms.claim.enums.ClaimStatus;
 import com.insurance.icms.claim.repository.ClaimRepository;
 import com.insurance.icms.security.entity.User;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,16 +21,35 @@ public class ClaimService {
 		this.auditService = auditService;
 	}
 
-	// ---------------- CUSTOMER ----------------
+	public void approveClaim(Long claimId, User admin, String remarks) {
 
-	public void createDraftClaim(Claim claim, User customer) {
+		Claim claim = claimRepository.findById(claimId).orElseThrow(() -> new RuntimeException("Claim not found"));
 
-		claim.setCustomer(customer);
-		claim.setStatus(ClaimStatus.DRAFT);
-		claim.setCreatedAt(LocalDateTime.now());
+		ClaimStatus oldStatus = claim.getStatus();
+
+		claim.setStatus(ClaimStatus.APPROVED);
+		claim.setUpdatedAt(LocalDateTime.now());
 
 		claimRepository.save(claim);
+
+		auditService.logStatusChange(claim, oldStatus, ClaimStatus.APPROVED, admin, remarks);
 	}
+
+	public void rejectClaim(Long claimId, User admin, String remarks) {
+
+		Claim claim = claimRepository.findById(claimId).orElseThrow(() -> new RuntimeException("Claim not found"));
+
+		ClaimStatus oldStatus = claim.getStatus();
+
+		claim.setStatus(ClaimStatus.REJECTED);
+		claim.setUpdatedAt(LocalDateTime.now());
+
+		claimRepository.save(claim);
+
+		auditService.logStatusChange(claim, oldStatus, ClaimStatus.REJECTED, admin, remarks);
+	}
+
+
 
 	public void submitClaim(Long claimId, User customer) {
 
@@ -45,8 +64,6 @@ public class ClaimService {
 
 		auditService.logStatusChange(claim, oldStatus, ClaimStatus.SUBMITTED, customer, "Claim submitted by customer");
 	}
-
-	
 
 	// ---------------- ADMIN ----------------
 
@@ -96,5 +113,19 @@ public class ClaimService {
 
 	public Claim getClaimById(Long id) {
 		return claimRepository.findById(id).orElseThrow(() -> new RuntimeException("Claim not found"));
+	}
+
+	public Claim createDraftClaim(ClaimRequestDto dto, User customer) {
+
+		Claim claim = new Claim();
+		claim.setPolicyNumber(dto.getPolicyNumber());
+		claim.setClaimType(dto.getClaimType());
+		claim.setClaimAmount(dto.getClaimAmount());
+		claim.setDescription(dto.getDescription());
+		claim.setCustomer(customer);
+		claim.setStatus(ClaimStatus.DRAFT);
+		claim.setCreatedAt(LocalDateTime.now());
+
+		return claimRepository.save(claim);
 	}
 }

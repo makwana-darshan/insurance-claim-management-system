@@ -52,7 +52,20 @@ public class DataInitializer {
 
 				userRepo.save(admin);
 			}
-			
+
+			/* ---------- CLAIM OFFICER TEST USER ---------- */
+			if (userRepo.findByEmail("officer@icms.com").isEmpty()) {
+
+				User officer = new User();
+				officer.setFullName("Test Claim Officer");
+				officer.setEmail("officer@icms.com");
+				officer.setPassword(encoder.encode("officer123"));
+				officer.setStatus(UserStatus.ACTIVE);
+				officer.setRoles(Set.of(claimOfficer));
+
+				userRepo.save(officer);
+			}
+
 			/* ---------- CUSTOMER TEST USER ---------- */
 			if (userRepo.findByEmail("customer@icms.com").isEmpty()) {
 				User customerUser = new User();

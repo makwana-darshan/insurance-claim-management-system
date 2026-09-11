@@ -1,48 +1,61 @@
 package com.insurance.icms.claim.controller;
 
+import com.insurance.icms.claim.dto.AssignSurveyorRequestDto;
+import com.insurance.icms.claim.dto.ClaimResponseDto;
+import com.insurance.icms.claim.entity.Claim;
 import com.insurance.icms.claim.enums.ClaimStatus;
 import com.insurance.icms.claim.service.ClaimService;
+import com.insurance.icms.security.dto.UserSummaryDto;
 import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.repository.UserRepository;
+import com.insurance.icms.security.service.CustomUserDetails;
+import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/claim")
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/claim-officer")
 public class ClaimOfficerController {
 
-    private final ClaimService claimService;
-    private final UserRepository userRepository;
+	private final ClaimService claimService;
+	private final UserRepository userRepository;
 
-    public ClaimOfficerController(ClaimService claimService,
-                                  UserRepository userRepository) {
-        this.claimService = claimService;
-        this.userRepository = userRepository;
-    }
+	public ClaimOfficerController(ClaimService claimService, UserRepository userRepository) {
+		this.claimService = claimService;
+		this.userRepository = userRepository;
+	}
 
-    @GetMapping("/dashboard")
-    public String dashboard(Model model) {
-        model.addAttribute("claims",
-                claimService.getClaimsByStatus(ClaimStatus.SUBMITTED));
-        model.addAttribute("surveyors",
-                userRepository.findByRole("SURVEYOR"));
-        return "claim/dashboard";
-    }
+	@GetMapping("/dashboard")
+	public List<ClaimResponseDto> dashboard() {
 
-    @PostMapping("/assign/{claimId}")
-    public String assignSurveyor(@PathVariable Long claimId,
-                                 @RequestParam Long surveyorId,
-                                 Authentication authentication) {
+		List<Claim> claims = claimService.getClaimsByStatus(ClaimStatus.SUBMITTED);
 
-        User admin = (User) authentication.getPrincipal();
+		return claims.stream().map(ClaimResponseDto::fromEntity).collect(Collectors.toList());
+	}
 
-        User surveyor = userRepository.findById(surveyorId)
-                .orElseThrow(() -> new RuntimeException("Surveyor not found"));
+	@GetMapping("/surveyors")
+	public List<UserSummaryDto> getSurveyors() {
 
-        claimService.assignSurveyor(claimId, admin, surveyor);
+		return userRepository.findByRole("SURVEYOR").stream().map(UserSummaryDto::fromEntity)
+				.collect(Collectors.toList());
+	}
 
-        return "redirect:/claim/dashboard";
-    }
+	@PostMapping("/claims/{claimId}/assign")
+	public ClaimResponseDto assignSurveyor(@PathVariable Long claimId,
+			@Valid @RequestBody AssignSurveyorRequestDto request, Authentication authentication) {
+
+		User officer = ((CustomUserDetails) authentication.getPrincipal()).getUser();
+
+		User surveyor = userRepository.findById(request.getSurveyorId())
+				.orElseThrow(() -> new RuntimeException("Surveyor not found"));
+
+		claimService.assignSurveyor(claimId, officer, surveyor);
+
+		Claim claim = claimService.getClaimById(claimId);
+
+		return ClaimResponseDto.fromEntity(claim);
+	}
 }

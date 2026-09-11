@@ -1,14 +1,22 @@
 package com.insurance.icms.claim.controller;
 
+import com.insurance.icms.claim.dto.ClaimAuditLogDto;
+import com.insurance.icms.claim.dto.ClaimResponseDto;
 import com.insurance.icms.claim.entity.Claim;
 import com.insurance.icms.claim.service.ClaimAuditService;
 import com.insurance.icms.claim.service.ClaimService;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
+import com.insurance.icms.security.entity.User;
+import com.insurance.icms.security.service.CustomUserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/claims")
+import java.util.HashMap;
+import java.util.Map;
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/claims")
 public class ClaimTimelineController {
 
 	private final ClaimService claimService;
@@ -20,13 +28,27 @@ public class ClaimTimelineController {
 	}
 
 	@GetMapping("/{id}/timeline")
-	public String timeline(@PathVariable Long id, Model model) {
+	public Map<String, Object> timeline(@PathVariable Long id, Authentication authentication) {
 
 		Claim claim = claimService.getClaimById(id);
 
-		model.addAttribute("claim", claim);
-		model.addAttribute("timeline", auditService.getTimeline(claim));
+		User currentUser = ((CustomUserDetails) authentication.getPrincipal()).getUser();
 
-		return "claim/timeline";
+		boolean isOwner = claim.getCustomer() != null && claim.getCustomer().getId().equals(currentUser.getId());
+
+		boolean isStaff = currentUser.getRoles().stream().anyMatch(role -> !role.getRoleName().equals("CUSTOMER"));
+
+		if (!isOwner && !isStaff) {
+			throw new RuntimeException("Not authorized to view this claim's timeline");
+		}
+
+		List<ClaimAuditLogDto> timeline = auditService.getTimeline(claim).stream().map(ClaimAuditLogDto::fromEntity)
+				.collect(Collectors.toList());
+
+		Map<String, Object> response = new HashMap<>();
+		response.put("claim", ClaimResponseDto.fromEntity(claim));
+		response.put("timeline", timeline);
+
+		return response;
 	}
 }

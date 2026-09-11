@@ -1,14 +1,18 @@
 package com.insurance.icms.surveyor.controller;
 
+import com.insurance.icms.claim.dto.ClaimResponseDto;
+import com.insurance.icms.claim.entity.Claim;
 import com.insurance.icms.claim.service.ClaimService;
 import com.insurance.icms.security.entity.User;
+import com.insurance.icms.security.service.CustomUserDetails;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/surveyor")
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/surveyor")
 public class SurveyorDashboardController {
 
 	private final ClaimService claimService;
@@ -18,20 +22,24 @@ public class SurveyorDashboardController {
 	}
 
 	@GetMapping("/dashboard")
-	public String dashboard(Model model, Authentication authentication) {
+	public List<ClaimResponseDto> dashboard(Authentication authentication) {
 
-		User surveyor = (User) authentication.getPrincipal();
-		model.addAttribute("claims", claimService.getClaimsBySurveyor(surveyor));
+		User surveyor = ((CustomUserDetails) authentication.getPrincipal()).getUser();
 
-		return "surveyor/dashboard";
+		List<Claim> claims = claimService.getClaimsBySurveyor(surveyor);
+
+		return claims.stream().map(ClaimResponseDto::fromEntity).collect(Collectors.toList());
 	}
 
-	@PostMapping("/inspect/{id}")
-	public String inspectClaim(@PathVariable Long id, Authentication authentication) {
+	@PostMapping("/claims/{id}/inspect")
+	public ClaimResponseDto inspectClaim(@PathVariable Long id, Authentication authentication) {
 
-		User surveyor = (User) authentication.getPrincipal();
+		User surveyor = ((CustomUserDetails) authentication.getPrincipal()).getUser();
+
 		claimService.markInspected(id, surveyor);
 
-		return "redirect:/surveyor/dashboard";
+		Claim claim = claimService.getClaimById(id);
+
+		return ClaimResponseDto.fromEntity(claim);
 	}
 }

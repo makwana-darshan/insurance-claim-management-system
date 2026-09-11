@@ -1,49 +1,57 @@
 package com.insurance.icms.admin.controller;
 
-import com.insurance.icms.claim.enums.ClaimStatus;
+import com.insurance.icms.claim.dto.ClaimDecisionRequestDto;
+import com.insurance.icms.claim.dto.ClaimResponseDto;
+import com.insurance.icms.claim.entity.Claim;
+import com.insurance.icms.claim.repository.ClaimRepository;
 import com.insurance.icms.claim.service.ClaimService;
 import com.insurance.icms.security.entity.User;
-import com.insurance.icms.security.service.UserService;
+import com.insurance.icms.security.service.CustomUserDetails;
 import org.springframework.security.core.Authentication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping("/admin/claims")
+import java.util.List;
+import java.util.stream.Collectors;
+
+@RestController
+@RequestMapping("/api/admin/claims")
 public class AdminClaimController {
 
+	private final ClaimRepository claimRepository;
 	private final ClaimService claimService;
-	private final UserService userService;
 
-	public AdminClaimController(ClaimService claimService, UserService userService) {
+	public AdminClaimController(ClaimRepository claimRepository, ClaimService claimService) {
+		this.claimRepository = claimRepository;
 		this.claimService = claimService;
-		this.userService = userService;
 	}
 
 	@GetMapping
-	public String viewClaims(Model model) {
+	public List<ClaimResponseDto> getAllClaims() {
 
-		model.addAttribute("claims", claimService.getClaimsByStatus(ClaimStatus.SUBMITTED));
+		List<Claim> claims = claimRepository.findAll();
 
-		model.addAttribute("surveyors", userService.getAllSurveyors());
-
-		return "admin/claims";
+		return claims.stream().map(ClaimResponseDto::fromEntity).collect(Collectors.toList());
 	}
 
-	@PostMapping("/assign")
-	public String assignSurveyor(@RequestParam Long claimId, @RequestParam Long surveyorId,
+	@PostMapping("/{id}/approve")
+	public ClaimResponseDto approveClaim(@PathVariable Long id, @RequestBody ClaimDecisionRequestDto request,
 			Authentication authentication) {
 
-		// Logged-in admin
-		User admin = (User) authentication.getPrincipal();
+		User admin = ((CustomUserDetails) authentication.getPrincipal()).getUser();
 
-		// Selected surveyor
-		User surveyor = userService.getUserById(surveyorId);
+		claimService.approveClaim(id, admin, request.getRemarks());
 
-		// ✅ CORRECT METHOD CALL
-		claimService.assignSurveyor(claimId, admin, surveyor);
+		return ClaimResponseDto.fromEntity(claimService.getClaimById(id));
+	}
 
-		return "redirect:/admin/claims";
+	@PostMapping("/{id}/reject")
+	public ClaimResponseDto rejectClaim(@PathVariable Long id, @RequestBody ClaimDecisionRequestDto request,
+			Authentication authentication) {
+
+		User admin = ((CustomUserDetails) authentication.getPrincipal()).getUser();
+
+		claimService.rejectClaim(id, admin, request.getRemarks());
+
+		return ClaimResponseDto.fromEntity(claimService.getClaimById(id));
 	}
 }

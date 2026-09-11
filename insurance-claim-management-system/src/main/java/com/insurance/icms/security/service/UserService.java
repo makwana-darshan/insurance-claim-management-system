@@ -4,8 +4,6 @@ import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UserService {
 
@@ -13,10 +11,6 @@ public class UserService {
 
 	public UserService(UserRepository userRepository) {
 		this.userRepository = userRepository;
-	}
-
-	public List<User> getAllSurveyors() {
-		return userRepository.findByRoles_RoleName("SURVEYOR");
 	}
 
 	public User getUserById(Long id) {
