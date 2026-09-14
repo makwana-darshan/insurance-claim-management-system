@@ -1,7 +1,8 @@
-import { Component, computed } from '@angular/core';
+import { Component, computed, effect } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
+import { Title } from '@angular/platform-browser';
 import { TitleCasePipe } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-shell',
@@ -11,7 +12,16 @@ import { TitleCasePipe } from '@angular/common';
   styleUrl: './shell.css',
 })
 export class Shell {
-  constructor(public authService: AuthService) {}
+  constructor(
+    public authService: AuthService,
+    private titleService: Title,
+  ) {
+    effect(() => {
+      const role = this.primaryRole();
+      const roleName = role ? role.charAt(0) + role.slice(1).toLowerCase().replace('_', ' ') : '';
+      this.titleService.setTitle(roleName ? `ICMS - ${roleName}` : 'ICMS');
+    });
+  }
 
   user = computed(() => this.authService.getUser());
 
