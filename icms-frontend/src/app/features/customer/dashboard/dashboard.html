@@ -4,16 +4,16 @@
     <a routerLink="/customer/claims/new" class="btn-primary">+ New Claim</a>
   </div>
 
-  @if (loading) {
+  @if (loading()) {
   <p>Loading claims...</p>
   }
 
-  @if (errorMessage) {
-  <p class="error">{{ errorMessage }}</p>
+  @if (errorMessage()) {
+  <p class="error">{{ errorMessage() }}</p>
   }
 
-  @if (!loading && !errorMessage) {
-  @if (claims.length === 0) {
+  @if (!loading() && !errorMessage()) {
+  @if (claims().length === 0) {
   <p class="empty">You haven't filed any claims yet.</p>
   } @else {
   <table>
@@ -28,7 +28,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (claim of claims; track claim.id) {
+      @for (claim of claims(); track claim.id) {
       <tr>
         <td>{{ claim.policyNumber }}</td>
         <td>{{ claim.claimType }}</td>
@@ -41,13 +41,13 @@
         <td>{{ claim.createdAt | date:'medium' }}</td>
         <td>
           @if (claim.status === 'DRAFT') {
-          <button class="btn-submit" [disabled]="submittingId === claim.id" (click)="submitClaim(claim)">
-            {{ submittingId === claim.id ? 'Submitting...' : 'Submit' }}
+          <button class="btn-submit" [disabled]="submittingId() === claim.id" (click)="submitClaim(claim)">
+            {{ submittingId() === claim.id ? 'Submitting...' : 'Submit' }}
           </button>
-          } @else {
-          <span class="muted">—</span>
           }
+          <a [routerLink]="['/customer/claims', claim.id, 'timeline']" class="view-link">View</a>
         </td>
+
       </tr>
       }
     </tbody>

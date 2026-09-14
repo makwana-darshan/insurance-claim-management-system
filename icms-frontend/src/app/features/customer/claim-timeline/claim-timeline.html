@@ -1,0 +1,47 @@
+<div class="page">
+  <a routerLink="/customer/dashboard" class="back-link">← Back to My Claims</a>
+
+  @if (loading()) {
+    <p>Loading timeline...</p>
+  }
+
+  @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (data(); as result) {
+    <div class="claim-header">
+      <h2>Claim #{{ result.claim.id }} — {{ result.claim.policyNumber }}</h2>
+      <p>{{ result.claim.claimType }} · {{ result.claim.claimAmount | number:'1.2-2' }}</p>
+      <span class="status-badge" [class]="result.claim.status.toLowerCase()">
+        {{ result.claim.status }}
+      </span>
+    </div>
+
+    <h3>Timeline</h3>
+
+    @if (result.timeline.length === 0) {
+      <p class="empty">No history yet.</p>
+    } @else {
+      <div class="timeline">
+        @for (log of result.timeline; track log.id) {
+          <div class="event">
+            <div class="event-status">
+              @if (log.fromStatus) {
+                <span>{{ log.fromStatus }} → {{ log.toStatus }}</span>
+              } @else {
+                <span>{{ log.toStatus }}</span>
+              }
+            </div>
+            <div class="event-meta">
+              By {{ log.actionByName || 'System' }} on {{ log.actionAt | date:'medium' }}
+            </div>
+            @if (log.remarks) {
+              <div class="event-remarks">{{ log.remarks }}</div>
+            }
+          </div>
+        }
+      </div>
+    }
+  }
+</div>

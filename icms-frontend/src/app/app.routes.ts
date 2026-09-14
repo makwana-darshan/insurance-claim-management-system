@@ -6,6 +6,7 @@ import { Dashboard as ClaimOfficerDashboard } from './features/claim-officer/das
 import { Dashboard as AdminDashboard } from './features/admin/dashboard/dashboard';
 import { Dashboard as SurveyorDashboard } from './features/surveyor/dashboard/dashboard';
 import { CreateClaim } from './features/customer/create-claim/create-claim';
+import { ClaimTimeline } from './features/customer/claim-timeline/claim-timeline';
 import { roleGuard } from './core/guards/role.guard';
 import { authGuard } from './core/guards/auth.guard';
 
@@ -44,6 +45,12 @@ export const routes: Routes = [
       {
         path: 'customer/claims/new',
         component: CreateClaim,
+        canActivate: [roleGuard],
+        data: { role: 'CUSTOMER' },
+      },
+      {
+        path: 'customer/claims/:id/timeline',
+        component: ClaimTimeline,
         canActivate: [roleGuard],
         data: { role: 'CUSTOMER' },
       },

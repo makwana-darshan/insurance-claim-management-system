@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ClaimService } from '../../../core/services/claim.service';
@@ -12,10 +12,10 @@ import { ClaimResponse } from '../../../core/models/claim.model';
   styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
-  claims: ClaimResponse[] = [];
-  loading = true;
-  errorMessage = '';
-  submittingId: number | null = null;
+  claims = signal<ClaimResponse[]>([]);
+  loading = signal(true);
+  errorMessage = signal('');
+  submittingId = signal<number | null>(null);
 
   constructor(private claimService: ClaimService) {}
 
@@ -24,38 +24,32 @@ export class Dashboard implements OnInit {
   }
 
   loadClaims(): void {
-    this.loading = true;
-    this.errorMessage = '';
+    this.loading.set(true);
+    this.errorMessage.set('');
 
     this.claimService.getMyClaims().subscribe({
       next: (claims) => {
-        console.log('DEBUG: claims received', claims);
-        this.claims = claims;
-        this.loading = false;
-        console.log('DEBUG: loading set to false');
+        this.claims.set(claims);
+        this.loading.set(false);
       },
-      error: (err) => {
-        console.log('DEBUG: error occurred', err);
-        this.errorMessage = 'Failed to load claims. Please try again.';
-        this.loading = false;
+      error: () => {
+        this.errorMessage.set('Failed to load claims. Please try again.');
+        this.loading.set(false);
       },
     });
   }
 
   submitClaim(claim: ClaimResponse): void {
-    this.submittingId = claim.id;
+    this.submittingId.set(claim.id);
 
     this.claimService.submitClaim(claim.id).subscribe({
       next: (updated) => {
-        const index = this.claims.findIndex((c) => c.id === updated.id);
-        if (index !== -1) {
-          this.claims[index] = updated;
-        }
-        this.submittingId = null;
+        this.claims.update((list) => list.map((c) => (c.id === updated.id ? updated : c)));
+        this.submittingId.set(null);
       },
       error: () => {
-        this.errorMessage = 'Failed to submit claim. Please try again.';
-        this.submittingId = null;
+        this.errorMessage.set('Failed to submit claim. Please try again.');
+        this.submittingId.set(null);
       },
     });
   }

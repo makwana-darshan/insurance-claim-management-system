@@ -37,14 +37,14 @@
             <textarea id="description" formControlName="description" rows="4"></textarea>
         </div>
 
-        @if (errorMessage) {
-        <p class="error">{{ errorMessage }}</p>
+        @if (errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
         }
 
         <div class="actions">
             <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
-            <button type="submit" class="btn-primary" [disabled]="submitting">
-                {{ submitting ? 'Saving...' : 'Save & Submit Claim' }}
+            <button type="submit" class="btn-primary" [disabled]="submitting()">
+                {{ submitting() ? 'Saving...' : 'Save & Submit Claim' }}
             </button>
         </div>
 

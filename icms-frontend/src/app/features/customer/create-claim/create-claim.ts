@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { ClaimService } from '../../../core/services/claim.service';
 
 @Component({
@@ -13,10 +13,10 @@ import { ClaimService } from '../../../core/services/claim.service';
 export class CreateClaim {
   claimTypes = ['HEALTH', 'VEHICLE', 'LIFE'];
 
-  form = this.createForm();
+  form: FormGroup;
 
-  submitting = false;
-  errorMessage = '';
+  submitting = signal(false);
+  errorMessage = signal('');
 
   constructor(
     private fb: FormBuilder,
@@ -41,8 +41,8 @@ export class CreateClaim {
       return;
     }
 
-    this.submitting = true;
-    this.errorMessage = '';
+    this.submitting.set(true);
+    this.errorMessage.set('');
 
     const value = this.form.value;
 
@@ -55,16 +55,17 @@ export class CreateClaim {
       })
       .subscribe({
         next: () => {
-          this.submitting = false;
+          this.submitting.set(false);
           this.router.navigate(['/customer/dashboard']);
         },
         error: (err) => {
-          this.submitting = false;
-          this.errorMessage =
+          this.submitting.set(false);
+          this.errorMessage.set(
             err.error?.policyNumber ||
-            err.error?.claimAmount ||
-            err.error?.claimType ||
-            'Failed to create claim. Please check your input.';
+              err.error?.claimAmount ||
+              err.error?.claimType ||
+              'Failed to create claim. Please check your input.',
+          );
         },
       });
   }

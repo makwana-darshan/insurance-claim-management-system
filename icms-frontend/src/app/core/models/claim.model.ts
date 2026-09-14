@@ -26,3 +26,16 @@ export interface ClaimResponse {
   createdAt: string;
   updatedAt: string | null;
 }
+export interface ClaimAuditLog {
+  id: number;
+  fromStatus: ClaimStatus | null;
+  toStatus: ClaimStatus;
+  actionByName: string | null;
+  remarks: string | null;
+  actionAt: string;
+}
+
+export interface ClaimTimelineResponse {
+  claim: ClaimResponse;
+  timeline: ClaimAuditLog[];
+}

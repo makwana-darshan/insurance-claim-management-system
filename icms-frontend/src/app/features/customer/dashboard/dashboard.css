@@ -115,3 +115,10 @@ th {
 .muted {
   color: #94a3b8;
 }
+
+.view-link {
+  margin-left: 10px;
+  color: #2563eb;
+  font-size: 13px;
+  text-decoration: none;
+}
