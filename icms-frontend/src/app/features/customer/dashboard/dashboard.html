@@ -1,0 +1,57 @@
+<div class="page">
+  <div class="header">
+    <h2>My Claims</h2>
+    <a routerLink="/customer/claims/new" class="btn-primary">+ New Claim</a>
+  </div>
+
+  @if (loading) {
+  <p>Loading claims...</p>
+  }
+
+  @if (errorMessage) {
+  <p class="error">{{ errorMessage }}</p>
+  }
+
+  @if (!loading && !errorMessage) {
+  @if (claims.length === 0) {
+  <p class="empty">You haven't filed any claims yet.</p>
+  } @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Policy Number</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Created</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (claim of claims; track claim.id) {
+      <tr>
+        <td>{{ claim.policyNumber }}</td>
+        <td>{{ claim.claimType }}</td>
+        <td>{{ claim.claimAmount | number:'1.2-2' }}</td>
+        <td>
+          <span class="status-badge" [class]="claim.status.toLowerCase()">
+            {{ claim.status }}
+          </span>
+        </td>
+        <td>{{ claim.createdAt | date:'medium' }}</td>
+        <td>
+          @if (claim.status === 'DRAFT') {
+          <button class="btn-submit" [disabled]="submittingId === claim.id" (click)="submitClaim(claim)">
+            {{ submittingId === claim.id ? 'Submitting...' : 'Submit' }}
+          </button>
+          } @else {
+          <span class="muted">—</span>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+  }
+</div>

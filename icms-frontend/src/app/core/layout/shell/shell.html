@@ -1,0 +1,17 @@
+<div class="shell">
+  <nav class="navbar">
+    <div class="brand">ICMS</div>
+
+    <div class="user-info">
+      @if (authService.getUser(); as user) {
+        <span class="name">{{ user.fullName }}</span>
+        <span class="role">{{ user.roles.join(', ') }}</span>
+      }
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </nav>
+
+  <main class="content">
+    <router-outlet></router-outlet>
+  </main>
+</div>

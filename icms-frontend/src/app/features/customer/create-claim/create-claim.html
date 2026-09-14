@@ -1,0 +1,52 @@
+<div class="page">
+    <h2>New Claim</h2>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+        <div class="field">
+            <label for="policyNumber">Policy Number</label>
+            <input id="policyNumber" type="text" formControlName="policyNumber" />
+            @if (form.get('policyNumber')?.invalid && form.get('policyNumber')?.touched) {
+            <span class="field-error">Policy number is required</span>
+            }
+        </div>
+
+        <div class="field">
+            <label for="claimType">Claim Type</label>
+            <select id="claimType" formControlName="claimType">
+                <option value="" disabled>-- Select --</option>
+                @for (type of claimTypes; track type) {
+                <option [value]="type">{{ type }}</option>
+                }
+            </select>
+            @if (form.get('claimType')?.invalid && form.get('claimType')?.touched) {
+            <span class="field-error">Claim type is required</span>
+            }
+        </div>
+
+        <div class="field">
+            <label for="claimAmount">Claim Amount</label>
+            <input id="claimAmount" type="number" formControlName="claimAmount" step="0.01" />
+            @if (form.get('claimAmount')?.invalid && form.get('claimAmount')?.touched) {
+            <span class="field-error">A valid amount greater than 0 is required</span>
+            }
+        </div>
+
+        <div class="field">
+            <label for="description">Description</label>
+            <textarea id="description" formControlName="description" rows="4"></textarea>
+        </div>
+
+        @if (errorMessage) {
+        <p class="error">{{ errorMessage }}</p>
+        }
+
+        <div class="actions">
+            <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
+            <button type="submit" class="btn-primary" [disabled]="submitting">
+                {{ submitting ? 'Saving...' : 'Save & Submit Claim' }}
+            </button>
+        </div>
+
+    </form>
+</div>
