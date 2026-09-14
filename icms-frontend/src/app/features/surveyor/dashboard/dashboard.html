@@ -1,4 +1,54 @@
 <div class="page">
-  <h2>surveyor Dashboard</h2>
-  <p>This is where your claims will appear.</p>
+  <h2>Assigned Claims</h2>
+
+  @if (loading()) {
+  <p>Loading claims...</p>
+  }
+
+  @if (errorMessage()) {
+  <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (!loading()) {
+  @if (claims().length === 0) {
+  <p class="empty">No claims assigned to you.</p>
+  } @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Policy Number</th>
+        <th>Customer</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (claim of claims(); track claim.id) {
+      <tr>
+        <td>{{ claim.policyNumber }}</td>
+        <td>{{ claim.customerName }}</td>
+        <td>{{ claim.claimType }}</td>
+        <td>{{ claim.claimAmount | number:'1.2-2' }}</td>
+        <td>
+          <span class="status-badge" [class]="claim.status.toLowerCase()">
+            {{ claim.status }}
+          </span>
+        </td>
+        <td>
+          @if (claim.status === 'UNDER_REVIEW') {
+          <button class="btn-inspect" [disabled]="inspectingId() === claim.id" (click)="inspect(claim)">
+            {{ inspectingId() === claim.id ? 'Marking...' : 'Mark Inspected' }}
+          </button>
+          } @else {
+          <span class="muted">—</span>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+  }
 </div>

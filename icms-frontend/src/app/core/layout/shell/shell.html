@@ -1,13 +1,30 @@
 <div class="shell">
   <nav class="navbar">
-    <div class="brand">ICMS</div>
+    <div class="navbar-left">
+      <div class="brand">
+        <span class="brand-icon">🛡️</span>
+        <span class="brand-text">ICMS</span>
+      </div>
 
-    <div class="user-info">
-      @if (authService.getUser(); as user) {
-        <span class="name">{{ user.fullName }}</span>
-        <span class="role">{{ user.roles.join(', ') }}</span>
-      }
-      <button class="logout-btn" (click)="logout()">Logout</button>
+      <div class="nav-links">
+        @for (link of navLinks(); track link.path) {
+        <a [routerLink]="link.path" routerLinkActive="active" class="nav-link">{{ link.label }}</a>
+        }
+      </div>
+    </div>
+
+    <div class="navbar-right">
+      <div class="user-badge">
+        <div class="avatar">{{ initials() }}</div>
+        <div class="user-text">
+          <span class="user-name">{{ user()?.fullName }}</span>
+          <span class="user-role">{{ primaryRole() | titlecase }}</span>
+        </div>
+      </div>
+
+      <button class="logout-btn" (click)="logout()" title="Logout">
+        <span class="logout-icon">⏻</span>
+      </button>
     </div>
   </nav>
 

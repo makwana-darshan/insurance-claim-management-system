@@ -1,4 +1,52 @@
 <div class="page">
-  <h2>claim-officer Dashboard</h2>
-  <p>This is where your claims will appear.</p>
+  <h2>Submitted Claims</h2>
+
+  @if (loading()) {
+  <p>Loading claims...</p>
+  }
+
+  @if (errorMessage()) {
+  <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (!loading()) {
+  @if (claims().length === 0) {
+  <p class="empty">No submitted claims awaiting assignment.</p>
+  } @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Policy Number</th>
+        <th>Customer</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Submitted</th>
+        <th>Assign Surveyor</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (claim of claims(); track claim.id) {
+      <tr>
+        <td>{{ claim.policyNumber }}</td>
+        <td>{{ claim.customerName }}</td>
+        <td>{{ claim.claimType }}</td>
+        <td>{{ claim.claimAmount | number:'1.2-2' }}</td>
+        <td>{{ claim.createdAt | date:'medium' }}</td>
+        <td class="assign-cell">
+          <select (change)="onSurveyorSelect(claim.id, $any($event.target).value)">
+            <option value="">-- Select Surveyor --</option>
+            @for (surveyor of surveyors(); track surveyor.id) {
+            <option [value]="surveyor.id">{{ surveyor.fullName }}</option>
+            }
+          </select>
+          <button [disabled]="assigningId() === claim.id" (click)="assignSurveyor(claim)">
+            {{ assigningId() === claim.id ? 'Assigning...' : 'Assign' }}
+          </button>
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+  }
 </div>

@@ -1,4 +1,98 @@
 <div class="page">
-  <h2>admin Dashboard</h2>
-  <p>This is where your claims will appear.</p>
+  <h2>Admin Dashboard</h2>
+
+  @if (errorMessage()) {
+  <p class="error">{{ errorMessage() }}</p>
+  }
+
+  @if (summary(); as s) {
+  <div class="summary-cards">
+    <div class="card">
+      <div class="value">{{ s.totalClaims }}</div>
+      <div class="label">Total Claims</div>
+    </div>
+    <div class="card">
+      <div class="value">{{ s.submittedClaims }}</div>
+      <div class="label">Submitted</div>
+    </div>
+    <div class="card">
+      <div class="value">{{ s.underReviewClaims }}</div>
+      <div class="label">Under Review</div>
+    </div>
+    <div class="card">
+      <div class="value">{{ s.approvedClaims }}</div>
+      <div class="label">Approved</div>
+    </div>
+    <div class="card">
+      <div class="value">{{ s.rejectedClaims }}</div>
+      <div class="label">Rejected</div>
+    </div>
+    <div class="card">
+      <div class="value">{{ s.totalUsers }}</div>
+      <div class="label">Total Users</div>
+    </div>
+  </div>
+  }
+
+  <h3>All Claims</h3>
+
+  @if (loading()) {
+  <p>Loading claims...</p>
+  }
+
+  @if (!loading()) {
+  @if (claims().length === 0) {
+  <p class="empty">No claims found.</p>
+  } @else {
+  <table>
+    <thead>
+      <tr>
+        <th>Policy</th>
+        <th>Customer</th>
+        <th>Type</th>
+        <th>Amount</th>
+        <th>Status</th>
+        <th>Surveyor</th>
+        <th>Remarks</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (claim of claims(); track claim.id) {
+      <tr>
+        <td>{{ claim.policyNumber }}</td>
+        <td>{{ claim.customerName }}</td>
+        <td>{{ claim.claimType }}</td>
+        <td>{{ claim.claimAmount | number:'1.2-2' }}</td>
+        <td>
+          <span class="status-badge" [class]="claim.status.toLowerCase()">
+            {{ claim.status }}
+          </span>
+        </td>
+        <td>{{ claim.surveyorName || '—' }}</td>
+        <td>
+          @if (claim.status === 'INSPECTED') {
+          <input type="text" placeholder="Remarks" (input)="onRemarksChange(claim.id, $any($event.target).value)" />
+          } @else {
+          <span class="muted">—</span>
+          }
+        </td>
+        <td class="actions">
+          @if (claim.status === 'INSPECTED') {
+          <button class="btn-approve" [disabled]="actingId() === claim.id" (click)="approve(claim)">
+            Approve
+          </button>
+          <button class="btn-reject" [disabled]="actingId() === claim.id" (click)="reject(claim)">
+            Reject
+          </button>
+          } @else {
+          <span class="muted">—</span>
+          }
+        </td>
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+  }
 </div>
