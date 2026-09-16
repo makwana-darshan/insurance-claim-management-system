@@ -12,12 +12,12 @@ import { CreateClaim } from './features/customer/create-claim/create-claim';
 import { ClaimTimeline } from './features/customer/claim-timeline/claim-timeline';
 import { roleGuard } from './core/guards/role.guard';
 import { authGuard } from './core/guards/auth.guard';
+import { dashboardRedirectGuard } from './core/guards/dashboard-redirect.guard';
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: Register },
-  { path: 'account/change-password', component: ChangePassword },
 
   {
     path: '',
@@ -59,6 +59,15 @@ export const routes: Routes = [
         component: ClaimTimeline,
         canActivate: [roleGuard],
         data: { role: 'CUSTOMER' },
+      },
+      {
+        path: 'dashboard',
+        canActivate: [dashboardRedirectGuard],
+        children: [],
+      },
+      {
+        path: 'account/change-password',
+        component: ChangePassword,
       },
     ],
   },

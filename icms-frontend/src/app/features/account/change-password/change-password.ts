@@ -1,5 +1,6 @@
 import { Component, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AccountService } from '../../../core/services/account.service';
 
 @Component({
@@ -14,11 +15,30 @@ export class ChangePassword {
   newPassword = '';
   confirmNewPassword = '';
 
+  showCurrentPassword = signal(false);
+  showNewPassword = signal(false);
+  showConfirmPassword = signal(false);
+
   errorMessage = signal('');
   successMessage = signal('');
   loading = signal(false);
 
-  constructor(private accountService: AccountService) {}
+  constructor(
+    private accountService: AccountService,
+    private router: Router,
+  ) {}
+
+  toggleCurrentPassword(): void {
+    this.showCurrentPassword.update((v) => !v);
+  }
+
+  toggleNewPassword(): void {
+    this.showNewPassword.update((v) => !v);
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword.update((v) => !v);
+  }
 
   onSubmit(): void {
     this.errorMessage.set('');
@@ -44,10 +64,11 @@ export class ChangePassword {
       .subscribe({
         next: (response) => {
           this.loading.set(false);
-          this.successMessage.set(response.message);
-          this.currentPassword = '';
-          this.newPassword = '';
-          this.confirmNewPassword = '';
+          this.successMessage.set(response.message + ' Redirecting...');
+
+          setTimeout(() => {
+            this.router.navigate(['/dashboard']);
+          }, 1200);
         },
         error: (err) => {
           this.loading.set(false);

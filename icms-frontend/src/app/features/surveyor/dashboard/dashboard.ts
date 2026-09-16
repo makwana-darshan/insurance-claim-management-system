@@ -6,7 +6,7 @@ import { ClaimResponse } from '../../../core/models/claim.model';
 @Component({
   selector: 'app-surveyor-dashboard',
   standalone: true,
-  imports: [DatePipe, DecimalPipe],
+  imports: [DecimalPipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

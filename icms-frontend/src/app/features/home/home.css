@@ -18,6 +18,7 @@
     align-items: center;
     gap: 8px;
     color: white;
+    text-decoration: none;
 }
 
 .brand-icon {
