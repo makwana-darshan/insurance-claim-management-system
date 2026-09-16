@@ -1,5 +1,8 @@
 import { Routes } from '@angular/router';
+import { Home } from './features/home/home';
 import { LoginComponent } from './features/auth/login/login';
+import { Register } from './features/auth/register/register';
+import { ChangePassword } from './features/account/change-password/change-password';
 import { Shell } from './core/layout/shell/shell';
 import { Dashboard as CustomerDashboard } from './features/customer/dashboard/dashboard';
 import { Dashboard as ClaimOfficerDashboard } from './features/claim-officer/dashboard/dashboard';
@@ -11,7 +14,10 @@ import { roleGuard } from './core/guards/role.guard';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
+  { path: '', component: Home },
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: Register },
+  { path: 'account/change-password', component: ChangePassword },
 
   {
     path: '',

@@ -9,3 +9,9 @@ export interface LoginResponse {
   fullName: string;
   roles: string[];
 }
+
+export interface RegisterRequest {
+  fullName: string;
+  email: string;
+  password: string;
+}

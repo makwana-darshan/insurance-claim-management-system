@@ -129,3 +129,14 @@
   padding: 28px;
   background: #f8fafc;
 }
+
+.settings-link {
+  font-size: 18px;
+  text-decoration: none;
+  opacity: 0.8;
+  transition: opacity 0.15s ease;
+}
+
+.settings-link:hover {
+  opacity: 1;
+}

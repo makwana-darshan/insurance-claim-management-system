@@ -1,0 +1,87 @@
+<div class="home">
+    <nav class="top-nav">
+        <div class="brand">
+            <span class="brand-icon">🛡️</span>
+            <span class="brand-text">ICMS</span>
+        </div>
+        <div class="nav-actions">
+            <a routerLink="/login" class="btn-ghost">Log In</a>
+            <a routerLink="/register" class="btn-primary">Sign Up</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>Insurance claims,<br />handled simply.</h1>
+        <p class="hero-subtitle">
+            File claims, track their progress, and get decisions faster —
+            all in one place, built for customers, officers, and surveyors alike.
+        </p>
+        <div class="hero-actions">
+            <a routerLink="/register" class="btn-primary large">Get Started</a>
+            <a routerLink="/login" class="btn-ghost large">I already have an account</a>
+        </div>
+    </section>
+
+    <section class="features">
+        <div class="feature-card">
+            <div class="feature-icon">📝</div>
+            <h3>File a Claim</h3>
+            <p>Submit health, vehicle, or life insurance claims in minutes with a simple guided form.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">🔍</div>
+            <h3>Track Progress</h3>
+            <p>Follow your claim through every stage — from review to inspection to final decision.</p>
+        </div>
+        <div class="feature-card">
+            <div class="feature-icon">⚡</div>
+            <h3>Fast Decisions</h3>
+            <p>Claim officers, surveyors, and admins work together in one streamlined workflow.</p>
+        </div>
+    </section>
+
+    <section class="how-it-works">
+        <h2>How It Works</h2>
+        <p class="section-subtitle">From filing to resolution, in four simple steps</p>
+
+        <div class="steps">
+            @for (step of steps; track step.number) {
+            <div class="step-card">
+                <div class="step-number">{{ step.number }}</div>
+                <h3>{{ step.title }}</h3>
+                <p>{{ step.description }}</p>
+            </div>
+            }
+        </div>
+    </section>
+
+    <section class="roles-section">
+        <h2>Built for Every Role</h2>
+        <p class="section-subtitle">A dedicated workspace for everyone involved in the claims process</p>
+
+        <div class="roles-grid">
+            @for (role of roles; track role.name) {
+            <div class="role-card">
+                <div class="role-icon">{{ role.icon }}</div>
+                <h3>{{ role.name }}</h3>
+                <p>{{ role.description }}</p>
+            </div>
+            }
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2>Ready to get started?</h2>
+        <p>Create your account and file your first claim in minutes.</p>
+        <a routerLink="/register" class="btn-primary large">Create Free Account</a>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-links">
+            <a routerLink="/login">Log In</a>
+            <span class="divider">·</span>
+            <a routerLink="/register">Sign Up</a>
+        </div>
+        <p>&copy; 2026 ICMS — Insurance Claim Management System</p>
+    </footer>
+</div>

@@ -3,28 +3,40 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse } from '../models/auth.model';
+import { LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
 
 const TOKEN_KEY = 'icms_token';
 const USER_KEY = 'icms_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private http: HttpClient,
+    private router: Router,
+  ) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
-      .pipe(
-        tap(response => {
-          localStorage.setItem(TOKEN_KEY, response.token);
-          localStorage.setItem(USER_KEY, JSON.stringify({
-            email: response.email,
-            fullName: response.fullName,
-            roles: response.roles
-          }));
-        })
-      );
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/login`, credentials)
+      .pipe(tap((response) => this.storeSession(response)));
+  }
+
+  register(request: RegisterRequest): Observable<LoginResponse> {
+    return this.http
+      .post<LoginResponse>(`${environment.apiUrl}/auth/register`, request)
+      .pipe(tap((response) => this.storeSession(response)));
+  }
+
+  private storeSession(response: LoginResponse): void {
+    localStorage.setItem(TOKEN_KEY, response.token);
+    localStorage.setItem(
+      USER_KEY,
+      JSON.stringify({
+        email: response.email,
+        fullName: response.fullName,
+        roles: response.roles,
+      }),
+    );
   }
 
   logout(): void {
@@ -51,7 +63,6 @@ export class AuthService {
     return user ? user.roles.includes(role) : false;
   }
 
-  // Role -> default landing route, mirrors old CustomAuthenticationSuccessHandler logic
   getDefaultRouteForUser(): string {
     const user = this.getUser();
     if (!user) return '/login';

@@ -1,4 +1,4 @@
-.login-wrapper {
+.register-wrapper {
   min-height: 100vh;
   background: #0f172a;
   display: flex;
@@ -64,11 +64,21 @@
   padding: 20px;
 }
 
-.login-box {
+.register-box {
   background: white;
   padding: 32px;
   border-radius: 12px;
   width: 380px;
+}
+
+h2 {
+  margin: 0 0 6px 0;
+}
+
+.subtitle {
+  color: #64748b;
+  font-size: 13px;
+  margin: 0 0 24px 0;
 }
 
 .field {
@@ -96,6 +106,7 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  margin-top: 4px;
 }
 
 button:disabled {
@@ -109,14 +120,13 @@ button:disabled {
   margin-bottom: 12px;
 }
 
-.register-link {
+.login-link {
   text-align: center;
   font-size: 13px;
   color: #64748b;
   margin-top: 18px;
 }
 
-.register-link a {
+.login-link a {
   color: #2563eb;
   text-decoration: none;
-}
