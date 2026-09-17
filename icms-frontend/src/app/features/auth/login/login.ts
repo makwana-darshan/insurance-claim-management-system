@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
+import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -10,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class LoginComponent {
+export class LoginComponent implements OnInit {
   email = '';
   password = '';
   errorMessage = '';
@@ -19,7 +20,17 @@ export class LoginComponent {
   constructor(
     private authService: AuthService,
     private router: Router,
+    private route: ActivatedRoute,
+    private titleService: Title,
   ) {}
+
+  ngOnInit(): void {
+    this.titleService.setTitle('ICMS - Login');
+
+    if (this.route.snapshot.queryParamMap.get('sessionExpired') === 'true') {
+      this.errorMessage = 'Your session has expired. Please log in again.';
+    }
+  }
 
   onSubmit(): void {
     this.errorMessage = '';

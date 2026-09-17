@@ -1,4 +1,4 @@
-import { Component, computed, effect } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { TitleCasePipe } from '@angular/common';
@@ -12,6 +12,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './shell.css',
 })
 export class Shell {
+  menuOpen = signal(false);
+
   constructor(
     public authService: AuthService,
     private titleService: Title,
@@ -56,6 +58,14 @@ export class Shell {
         return [];
     }
   });
+
+  toggleMenu(): void {
+    this.menuOpen.update((v) => !v);
+  }
+
+  closeMenu(): void {
+    this.menuOpen.set(false);
+  }
 
   logout(): void {
     this.authService.logout();

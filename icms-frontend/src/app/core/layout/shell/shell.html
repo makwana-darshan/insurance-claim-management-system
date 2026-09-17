@@ -1,12 +1,10 @@
 <div class="shell">
   <nav class="navbar">
     <div class="navbar-left">
-      <div class="brand">
-        <a routerLink="/dashboard" class="brand">
-          <span class="brand-icon">🛡️</span>
-          <span class="brand-text">ICMS</span>
-        </a>
-      </div>
+      <a routerLink="/dashboard" class="brand">
+        <span class="brand-icon">🛡️</span>
+        <span class="brand-text">ICMS</span>
+      </a>
 
       <div class="nav-links">
         @for (link of navLinks(); track link.path) {
@@ -16,21 +14,34 @@
     </div>
 
     <div class="navbar-right">
-      <a routerLink="/account/change-password" class="settings-link" title="Change Password">⚙️</a>
+      <div class="user-menu">
+        <button class="user-badge" (click)="toggleMenu()">
+          <div class="avatar">{{ initials() }}</div>
+          <div class="user-text">
+            <span class="user-name">{{ user()?.fullName }}</span>
+            <span class="user-role">{{ primaryRole() | titlecase }}</span>
+          </div>
+          <span class="chevron" [class.open]="menuOpen()">▾</span>
+        </button>
 
-      <div class="user-badge">
-        <div class="avatar">{{ initials() }}</div>
-        <div class="user-text">
-          <span class="user-name">{{ user()?.fullName }}</span>
-          <span class="user-role">{{ primaryRole() | titlecase }}</span>
+        @if (menuOpen()) {
+        <div class="dropdown">
+          <a routerLink="/account/change-password" class="dropdown-item" (click)="closeMenu()">
+            <span class="item-icon">🔒</span> Change Password
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item logout-item" (click)="logout()">
+            <span class="item-icon">⏻</span> Logout
+          </button>
         </div>
+        }
       </div>
-
-      <button class="logout-btn" (click)="logout()" title="Logout">
-        <span class="logout-icon">⏻</span>
-      </button>
     </div>
   </nav>
+
+  @if (menuOpen()) {
+  <div class="backdrop" (click)="closeMenu()"></div>
+  }
 
   <main class="content">
     <router-outlet></router-outlet>
