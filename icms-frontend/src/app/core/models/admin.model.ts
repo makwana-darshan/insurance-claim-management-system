@@ -10,3 +10,18 @@ export interface AdminSummary {
 export interface ClaimDecisionRequest {
   remarks: string;
 }
+
+export interface UserResponse {
+  id: number;
+  fullName: string;
+  email: string;
+  status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
+  roles: string[];
+}
+
+export interface CreateUserRequest {
+  fullName: string;
+  email: string;
+  password: string;
+  role: string;
+}

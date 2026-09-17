@@ -6,6 +6,7 @@ import { ChangePassword } from './features/account/change-password/change-passwo
 import { Shell } from './core/layout/shell/shell';
 import { Dashboard as CustomerDashboard } from './features/customer/dashboard/dashboard';
 import { Dashboard as ClaimOfficerDashboard } from './features/claim-officer/dashboard/dashboard';
+import { Users } from './features/admin/users/users';
 import { Dashboard as AdminDashboard } from './features/admin/dashboard/dashboard';
 import { Dashboard as SurveyorDashboard } from './features/surveyor/dashboard/dashboard';
 import { CreateClaim } from './features/customer/create-claim/create-claim';
@@ -64,6 +65,12 @@ export const routes: Routes = [
         path: 'dashboard',
         canActivate: [dashboardRedirectGuard],
         children: [],
+      },
+      {
+        path: 'admin/users',
+        component: Users,
+        canActivate: [roleGuard],
+        data: { role: 'SUPER_ADMIN' },
       },
       {
         path: 'account/change-password',

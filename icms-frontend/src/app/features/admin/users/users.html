@@ -1,0 +1,88 @@
+<div class="page">
+    <div class="header">
+        <h2>User Management</h2>
+        <button class="btn-primary" (click)="toggleForm()">
+            {{ showForm() ? 'Cancel' : '+ Add Staff User' }}
+        </button>
+    </div>
+
+    @if (showForm()) {
+    <div class="form-card">
+        <h3>Create Staff Account</h3>
+
+        <div class="form-grid">
+            <div class="field">
+                <label>Full Name</label>
+                <input type="text" [(ngModel)]="fullName" placeholder="e.g. John Smith" />
+            </div>
+
+            <div class="field">
+                <label>Email</label>
+                <input type="email" [(ngModel)]="email" placeholder="e.g. john@icms.com" />
+            </div>
+
+            <div class="field">
+                <label>Password</label>
+                <input type="password" [(ngModel)]="password" placeholder="At least 6 characters" />
+            </div>
+
+            <div class="field">
+                <label>Role</label>
+                <select [(ngModel)]="role">
+                    <option value="" disabled selected>-- Select Role --</option>
+                    @for (r of availableRoles; track r) {
+                    <option [value]="r">{{ r.replace('_', ' ') }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+
+        @if (formError()) {
+        <div class="alert error">⚠️ {{ formError() }}</div>
+        }
+
+        <button class="btn-primary" [disabled]="creating()" (click)="createUser()">
+            {{ creating() ? 'Creating...' : 'Create Account' }}
+        </button>
+    </div>
+    }
+
+    @if (errorMessage()) {
+    <p class="error">{{ errorMessage() }}</p>
+    }
+
+    @if (loading()) {
+    <p>Loading users...</p>
+    }
+
+    @if (!loading()) {
+    <table>
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (user of users(); track user.id) {
+            <tr>
+                <td>{{ user.fullName }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                    @for (r of user.roles; track r) {
+                    <span class="role-badge">{{ r.replace('_', ' ') }}</span>
+                    }
+                </td>
+                <td>
+                    <span class="status-badge" [class]="user.status.toLowerCase()">
+                        {{ user.status }}
+                    </span>
+                </td>
+            </tr>
+            }
+        </tbody>
+    </table>
+    }
+</div>

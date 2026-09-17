@@ -51,7 +51,10 @@ export class Shell {
       case 'CLAIM_OFFICER':
         return [{ label: 'Submitted Claims', path: '/claim-officer/dashboard' }];
       case 'SUPER_ADMIN':
-        return [{ label: 'Overview', path: '/admin/dashboard' }];
+        return [
+          { label: 'Overview', path: '/admin/dashboard' },
+          { label: 'Users', path: '/admin/users' },
+        ];
       case 'SURVEYOR':
         return [{ label: 'Assigned Claims', path: '/surveyor/dashboard' }];
       default:

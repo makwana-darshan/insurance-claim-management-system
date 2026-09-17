@@ -3,11 +3,15 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { ClaimResponse } from '../models/claim.model';
-import { AdminSummary, ClaimDecisionRequest } from '../models/admin.model';
+import {
+  AdminSummary,
+  ClaimDecisionRequest,
+  UserResponse,
+  CreateUserRequest,
+} from '../models/admin.model';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-
   private baseUrl = `${environment.apiUrl}/admin`;
 
   constructor(private http: HttpClient) {}
@@ -26,5 +30,13 @@ export class AdminService {
 
   rejectClaim(id: number, request: ClaimDecisionRequest): Observable<ClaimResponse> {
     return this.http.post<ClaimResponse>(`${this.baseUrl}/claims/${id}/reject`, request);
+  }
+
+  getAllUsers(): Observable<UserResponse[]> {
+    return this.http.get<UserResponse[]>(`${this.baseUrl}/users`);
+  }
+
+  createUser(request: CreateUserRequest): Observable<UserResponse> {
+    return this.http.post<UserResponse>(`${this.baseUrl}/users`, request);
   }
 }
