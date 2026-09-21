@@ -2,16 +2,20 @@ package com.insurance.icms.security.service;
 
 import com.insurance.icms.security.dto.CreateUserRequest;
 import com.insurance.icms.security.dto.RegisterRequest;
+import com.insurance.icms.security.entity.PasswordResetToken;
 import com.insurance.icms.security.entity.Role;
 import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.entity.UserStatus;
+import com.insurance.icms.security.repository.PasswordResetTokenRepository;
 import com.insurance.icms.security.repository.RoleRepository;
 import com.insurance.icms.security.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Service
 public class UserAccountService {
@@ -22,12 +26,17 @@ public class UserAccountService {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final PasswordResetTokenRepository resetTokenRepository;
+	private final EmailService emailService;
 
 	public UserAccountService(UserRepository userRepository, RoleRepository roleRepository,
-			PasswordEncoder passwordEncoder) {
+			PasswordEncoder passwordEncoder, PasswordResetTokenRepository resetTokenRepository,
+			EmailService emailService) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.resetTokenRepository = resetTokenRepository;
+		this.emailService = emailService;
 	}
 
 	public User registerCustomer(RegisterRequest request) {
@@ -84,5 +93,45 @@ public class UserAccountService {
 
 	public List<User> getAllUsers() {
 		return userRepository.findAll();
+	}
+
+	public void requestPasswordReset(String email) {
+
+		userRepository.findByEmail(email).ifPresent(user -> {
+
+			String token = UUID.randomUUID().toString();
+
+			PasswordResetToken resetToken = new PasswordResetToken();
+			resetToken.setToken(token);
+			resetToken.setUser(user);
+			resetToken.setExpiresAt(LocalDateTime.now().plusMinutes(30));
+
+			resetTokenRepository.save(resetToken);
+
+			emailService.sendPasswordResetEmail(user.getEmail(), token);
+		});
+
+		// Intentionally no else/exception here -- see note below
+	}
+
+	public void resetPassword(String token, String newPassword) {
+
+		PasswordResetToken resetToken = resetTokenRepository.findByToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid or expired reset link"));
+
+		if (resetToken.isUsed()) {
+			throw new RuntimeException("This reset link has already been used");
+		}
+
+		if (resetToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("This reset link has expired");
+		}
+
+		User user = resetToken.getUser();
+		user.setPassword(passwordEncoder.encode(newPassword));
+		userRepository.save(user);
+
+		resetToken.setUsed(true);
+		resetTokenRepository.save(resetToken);
 	}
 }

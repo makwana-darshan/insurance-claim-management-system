@@ -1,8 +1,6 @@
 package com.insurance.icms.security.controller;
 
-import com.insurance.icms.security.dto.LoginRequest;
-import com.insurance.icms.security.dto.LoginResponse;
-import com.insurance.icms.security.dto.RegisterRequest;
+import com.insurance.icms.security.dto.*;
 import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.jwt.JwtService;
 import com.insurance.icms.security.service.CustomUserDetails;
@@ -15,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -60,5 +59,21 @@ public class AuthController {
 				.collect(Collectors.toList());
 
 		return new LoginResponse(token, user.getEmail(), user.getFullName(), roles);
+	}
+
+	@PostMapping("/forgot-password")
+	public Map<String, String> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+
+		userAccountService.requestPasswordReset(request.getEmail());
+
+		return Map.of("message", "If an account with that email exists, a reset link has been sent.");
+	}
+
+	@PostMapping("/reset-password")
+	public Map<String, String> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+
+		userAccountService.resetPassword(request.getToken(), request.getNewPassword());
+
+		return Map.of("message", "Password reset successfully. You can now log in.");
 	}
 }
