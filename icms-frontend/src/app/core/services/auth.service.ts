@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LoginRequest, LoginResponse, RegisterRequest } from '../models/auth.model';
+import {
+  LoginRequest,
+  LoginResponse,
+  RegisterRequest,
+  ForgotPasswordRequest,
+  ResetPasswordRequest,
+} from '../models/auth.model';
 
 const TOKEN_KEY = 'icms_token';
 const USER_KEY = 'icms_user';
@@ -25,6 +31,20 @@ export class AuthService {
     return this.http
       .post<LoginResponse>(`${environment.apiUrl}/auth/register`, request)
       .pipe(tap((response) => this.storeSession(response)));
+  }
+
+  forgotPassword(request: ForgotPasswordRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/forgot-password`,
+      request,
+    );
+  }
+
+  resetPassword(request: ResetPasswordRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${environment.apiUrl}/auth/reset-password`,
+      request,
+    );
   }
 
   private storeSession(response: LoginResponse): void {

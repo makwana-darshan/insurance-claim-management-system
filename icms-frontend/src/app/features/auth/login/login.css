@@ -120,3 +120,14 @@ button:disabled {
   color: #2563eb;
   text-decoration: none;
 }
+
+.forgot-link {
+  text-align: right;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.forgot-link a {
+  color: #2563eb;
+  text-decoration: none;
+}

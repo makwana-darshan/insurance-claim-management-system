@@ -14,11 +14,15 @@ import { ClaimTimeline } from './features/customer/claim-timeline/claim-timeline
 import { roleGuard } from './core/guards/role.guard';
 import { authGuard } from './core/guards/auth.guard';
 import { dashboardRedirectGuard } from './core/guards/dashboard-redirect.guard';
+import { ForgotPassword } from './features/auth/forgot-password/forgot-password';
+import { ResetPassword } from './features/auth/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: Home },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: Register },
+  { path: 'forgot-password', component: ForgotPassword },
+  { path: 'reset-password', component: ResetPassword },
 
   {
     path: '',
