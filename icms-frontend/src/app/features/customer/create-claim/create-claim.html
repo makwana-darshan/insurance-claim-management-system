@@ -1,6 +1,9 @@
 <div class="page">
-    <h2>New Claim</h2>
+    <h2>{{ isEditMode() ? 'Edit Claim' : 'New Claim' }}</h2>
 
+    @if (loading()) {
+    <p>Loading claim...</p>
+    } @else {
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
 
         <div class="field">
@@ -44,9 +47,10 @@
         <div class="actions">
             <button type="button" class="btn-secondary" (click)="cancel()">Cancel</button>
             <button type="submit" class="btn-primary" [disabled]="submitting()">
-                {{ submitting() ? 'Saving...' : 'Save & Submit Claim' }}
+                {{ submitting() ? 'Saving...' : (isEditMode() ? 'Save Changes' : 'Save & Submit Claim') }}
             </button>
         </div>
 
     </form>
+    }
 </div>

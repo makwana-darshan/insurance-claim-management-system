@@ -2,6 +2,7 @@ import { Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AccountService } from '../../../core/services/account.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-change-password',
@@ -47,6 +48,7 @@ export class ChangePassword {
   constructor(
     private accountService: AccountService,
     private router: Router,
+    private toastService: ToastService,
   ) {}
 
   toggleCurrentPassword(): void {
@@ -83,17 +85,16 @@ export class ChangePassword {
         newPassword: this.newPassword,
       })
       .subscribe({
-        next: (response) => {
+        next: () => {
           this.loading.set(false);
-          this.successMessage.set(response.message + ' Redirecting...');
+          this.toastService.success('Password changed successfully.');
 
           setTimeout(() => {
             this.router.navigate(['/dashboard']);
           }, 1200);
         },
-        error: (err) => {
+        error: () => {
           this.loading.set(false);
-          this.errorMessage.set(err.error?.error || 'Failed to change password. Please try again.');
         },
       });
   }

@@ -8,13 +8,12 @@
   <p>Loading claims...</p>
   }
 
-  @if (errorMessage()) {
-  <p class="error">{{ errorMessage() }}</p>
-  }
-
-  @if (!loading() && !errorMessage()) {
+  @if (!loading()) {
   @if (claims().length === 0) {
-  <p class="empty">You haven't filed any claims yet.</p>
+  <app-empty-state icon="📋" title="No claims yet"
+    message="When you file an insurance claim, it will appear here so you can track its progress.">
+    <a routerLink="/customer/claims/new" class="btn-primary">+ File Your First Claim</a>
+  </app-empty-state>
   } @else {
   <table>
     <thead>
@@ -44,6 +43,20 @@
           <button class="btn-submit" [disabled]="submittingId() === claim.id" (click)="submitClaim(claim)">
             {{ submittingId() === claim.id ? 'Submitting...' : 'Submit' }}
           </button>
+          <button class="btn-edit" (click)="editClaim(claim)">Edit</button>
+          }
+
+          @if (claim.status !== 'DRAFT' && claim.status !== 'APPROVED' && claim.status !== 'REJECTED' && claim.status
+          !== 'CANCELLED') {
+          @if (confirmingCancelId() === claim.id) {
+          <span class="confirm-text">Cancel this claim?</span>
+          <button class="btn-confirm-yes" [disabled]="cancellingId() === claim.id" (click)="confirmCancel(claim)">
+            {{ cancellingId() === claim.id ? '...' : 'Yes' }}
+          </button>
+          <button class="btn-confirm-no" (click)="dismissCancel()">No</button>
+          } @else {
+          <button class="btn-cancel" (click)="startCancel(claim)">Cancel</button>
+          }
           }
           <a [routerLink]="['/customer/claims', claim.id, 'timeline']" class="view-link">View</a>
         </td>

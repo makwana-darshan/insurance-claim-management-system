@@ -1,14 +1,17 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, computed, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { AdminService } from '../../../core/services/admin.service';
-import { ClaimResponse } from '../../../core/models/claim.model';
+import { ClaimResponse, ClaimStatus } from '../../../core/models/claim.model';
 import { AdminSummary } from '../../../core/models/admin.model';
+import { ToastService } from '../../../core/services/toast.service';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-admin-dashboard',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule],
+  imports: [DecimalPipe, FormsModule, RouterLink,EmptyState],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -17,10 +20,43 @@ export class Dashboard implements OnInit {
   claims = signal<ClaimResponse[]>([]);
   remarks = signal<Record<number, string>>({});
   loading = signal(true);
-  errorMessage = signal('');
   actingId = signal<number | null>(null);
 
-  constructor(private adminService: AdminService) {}
+  searchTerm = signal('');
+  statusFilter = signal<ClaimStatus | 'ALL'>('ALL');
+
+  statusOptions: (ClaimStatus | 'ALL')[] = [
+    'ALL',
+    'DRAFT',
+    'SUBMITTED',
+    'UNDER_REVIEW',
+    'SURVEYOR_ASSIGNED',
+    'INSPECTED',
+    'APPROVED',
+    'REJECTED',
+    'CANCELLED',
+  ];
+
+  filteredClaims = computed(() => {
+    const term = this.searchTerm().toLowerCase().trim();
+    const status = this.statusFilter();
+
+    return this.claims().filter((claim) => {
+      const matchesStatus = status === 'ALL' || claim.status === status;
+
+      const matchesSearch =
+        !term ||
+        claim.policyNumber.toLowerCase().includes(term) ||
+        (claim.customerName || '').toLowerCase().includes(term);
+
+      return matchesStatus && matchesSearch;
+    });
+  });
+
+  constructor(
+    private adminService: AdminService,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.loadSummary();
@@ -30,7 +66,7 @@ export class Dashboard implements OnInit {
   loadSummary(): void {
     this.adminService.getSummary().subscribe({
       next: (summary) => this.summary.set(summary),
-      error: () => this.errorMessage.set('Failed to load summary.'),
+      error: () => {},
     });
   }
 
@@ -43,10 +79,17 @@ export class Dashboard implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Failed to load claims.');
         this.loading.set(false);
       },
     });
+  }
+
+  onSearchChange(value: string): void {
+    this.searchTerm.set(value);
+  }
+
+  onStatusFilterChange(value: string): void {
+    this.statusFilter.set(value as ClaimStatus | 'ALL');
   }
 
   onRemarksChange(claimId: number, value: string): void {
@@ -62,9 +105,9 @@ export class Dashboard implements OnInit {
         this.claims.update((list) => list.map((c) => (c.id === updated.id ? updated : c)));
         this.actingId.set(null);
         this.loadSummary();
+        this.toastService.success('Claim approved.');
       },
       error: () => {
-        this.errorMessage.set('Failed to approve claim.');
         this.actingId.set(null);
       },
     });
@@ -79,9 +122,9 @@ export class Dashboard implements OnInit {
         this.claims.update((list) => list.map((c) => (c.id === updated.id ? updated : c)));
         this.actingId.set(null);
         this.loadSummary();
+        this.toastService.success('Claim rejected.');
       },
       error: () => {
-        this.errorMessage.set('Failed to reject claim.');
         this.actingId.set(null);
       },
     });

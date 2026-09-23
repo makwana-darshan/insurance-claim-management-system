@@ -3,11 +3,12 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { ClaimService } from '../../../core/services/claim.service';
 import { ClaimTimelineResponse } from '../../../core/models/claim.model';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-claim-timeline',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, RouterLink],
+  imports: [DatePipe, DecimalPipe, RouterLink,EmptyState],
   templateUrl: './claim-timeline.html',
   styleUrl: './claim-timeline.css',
 })

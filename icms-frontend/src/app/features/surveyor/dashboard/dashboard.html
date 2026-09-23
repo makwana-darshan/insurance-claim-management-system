@@ -11,7 +11,9 @@
 
   @if (!loading()) {
   @if (claims().length === 0) {
-  <p class="empty">No claims assigned to you.</p>
+  <app-empty-state icon="🔍" title="No assigned claims"
+    message="Claims assigned to you for inspection will appear here.">
+  </app-empty-state>
   } @else {
   <table>
     <thead>

@@ -25,3 +25,7 @@ export interface CreateUserRequest {
   password: string;
   role: string;
 }
+
+export interface UpdateUserStatusRequest {
+  status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED';
+}

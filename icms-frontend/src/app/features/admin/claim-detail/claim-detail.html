@@ -1,0 +1,93 @@
+<div class="page">
+    <a routerLink="/admin/dashboard" class="back-link">← Back to Dashboard</a>
+
+    @if (loading()) {
+    <p>Loading claim...</p>
+    }
+
+    @if (data(); as result) {
+    <div class="claim-header">
+        <div class="header-top">
+            <h2>Claim #{{ result.claim.id }} — {{ result.claim.policyNumber }}</h2>
+            <span class="status-badge" [class]="result.claim.status.toLowerCase()">
+                {{ result.claim.status }}
+            </span>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-item">
+                <span class="label">Customer</span>
+                <span class="value">{{ result.claim.customerName }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Type</span>
+                <span class="value">{{ result.claim.claimType }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Amount</span>
+                <span class="value">{{ result.claim.claimAmount | number:'1.2-2' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Surveyor</span>
+                <span class="value">{{ result.claim.surveyorName || '—' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Created</span>
+                <span class="value">{{ result.claim.createdAt | date:'medium' }}</span>
+            </div>
+            <div class="detail-item">
+                <span class="label">Last Updated</span>
+                <span class="value">{{ result.claim.updatedAt ? (result.claim.updatedAt | date:'medium') : '—' }}</span>
+            </div>
+        </div>
+
+        @if (result.claim.description) {
+        <div class="description">
+            <span class="label">Description</span>
+            <p>{{ result.claim.description }}</p>
+        </div>
+        }
+
+        @if (result.claim.status === 'INSPECTED') {
+        <div class="decision-panel">
+            <h3>Make a Decision</h3>
+            <textarea [(ngModel)]="remarks" placeholder="Add remarks (optional)..." rows="2"></textarea>
+            <div class="decision-actions">
+                <button class="btn-approve" [disabled]="acting()" (click)="approve()">
+                    {{ acting() ? '...' : 'Approve Claim' }}
+                </button>
+                <button class="btn-reject" [disabled]="acting()" (click)="reject()">
+                    {{ acting() ? '...' : 'Reject Claim' }}
+                </button>
+            </div>
+        </div>
+        }
+    </div>
+
+    <h3>Timeline</h3>
+
+    @if (result.timeline.length === 0) {
+    <p class="empty">No history yet.</p>
+    } @else {
+    <div class="timeline">
+        @for (log of result.timeline; track log.id) {
+        <div class="event">
+            <div class="event-status">
+                @if (log.fromStatus) {
+                <span>{{ log.fromStatus }} → {{ log.toStatus }}</span>
+                } @else {
+                <span>{{ log.toStatus }}</span>
+                }
+            </div>
+            <div class="event-meta">
+                By {{ log.actionByName || 'System' }} on {{ log.actionAt | date:'medium' }}
+            </div>
+            @if (log.remarks) {
+            <div class="event-remarks">{{ log.remarks }}</div>
+            }
+        </div>
+        }
+    </div>
+    }
+    }
+</div>

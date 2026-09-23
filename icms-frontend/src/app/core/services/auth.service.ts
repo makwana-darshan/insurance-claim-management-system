@@ -10,6 +10,7 @@ import {
   ForgotPasswordRequest,
   ResetPasswordRequest,
 } from '../models/auth.model';
+import { ToastService } from './toast.service';
 
 const TOKEN_KEY = 'icms_token';
 const USER_KEY = 'icms_user';
@@ -19,6 +20,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private router: Router,
+    private toastService: ToastService,
   ) {}
 
   login(credentials: LoginRequest): Observable<LoginResponse> {
@@ -66,6 +68,7 @@ export class AuthService {
 
   logout(): void {
     this.clearSession();
+    this.toastService.info('You have been logged out.');
     this.router.navigate(['/login']);
   }
 

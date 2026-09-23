@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 
@@ -10,6 +10,8 @@ import { Title } from '@angular/platform-browser';
   styleUrl: './home.css',
 })
 export class Home {
+  scrolled = signal(false);
+
   steps = [
     { number: '01', title: 'Sign Up', description: 'Create a free account in under a minute.' },
     {
@@ -40,7 +42,19 @@ export class Home {
     { icon: '✅', name: 'Admin', description: 'Approve or reject claims with full audit history.' },
   ];
 
+  stats = [
+    { value: '4', label: 'Role-based workspaces' },
+    { value: '7', label: 'Claim status stages' },
+    { value: '24/7', label: 'Access from anywhere' },
+    { value: '100%', label: 'Auditable history' },
+  ];
+
   constructor(private titleService: Title) {
     this.titleService.setTitle('ICMS - Insurance Claim Management System');
+  }
+
+  @HostListener('window:scroll')
+  onScroll(): void {
+    this.scrolled.set(window.scrollY > 20);
   }
 }

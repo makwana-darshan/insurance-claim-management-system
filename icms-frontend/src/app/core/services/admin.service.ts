@@ -8,6 +8,7 @@ import {
   ClaimDecisionRequest,
   UserResponse,
   CreateUserRequest,
+  UpdateUserStatusRequest,
 } from '../models/admin.model';
 
 @Injectable({ providedIn: 'root' })
@@ -38,5 +39,12 @@ export class AdminService {
 
   createUser(request: CreateUserRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(`${this.baseUrl}/users`, request);
+  }
+
+  updateUserStatus(
+    id: number,
+    status: 'ACTIVE' | 'INACTIVE' | 'BLOCKED',
+  ): Observable<UserResponse> {
+    return this.http.patch<UserResponse>(`${this.baseUrl}/users/${id}/status`, { status });
   }
 }

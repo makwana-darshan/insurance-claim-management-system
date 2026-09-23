@@ -4,11 +4,13 @@ import { FormsModule } from '@angular/forms';
 import { ClaimOfficerService } from '../../../core/services/claim-officer.service';
 import { ClaimResponse } from '../../../core/models/claim.model';
 import { Surveyor } from '../../../core/models/claim-officer.model';
+import { ToastService } from '../../../core/services/toast.service';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-claim-officer-dashboard',
   standalone: true,
-  imports: [DatePipe, DecimalPipe, FormsModule],
+  imports: [DatePipe, DecimalPipe, FormsModule, EmptyState],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -17,10 +19,12 @@ export class Dashboard implements OnInit {
   surveyors = signal<Surveyor[]>([]);
   selectedSurveyor = signal<Record<number, number | null>>({});
   loading = signal(true);
-  errorMessage = signal('');
   assigningId = signal<number | null>(null);
 
-  constructor(private claimOfficerService: ClaimOfficerService) {}
+  constructor(
+    private claimOfficerService: ClaimOfficerService,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.loadClaims();
@@ -29,7 +33,6 @@ export class Dashboard implements OnInit {
 
   loadClaims(): void {
     this.loading.set(true);
-    this.errorMessage.set('');
 
     this.claimOfficerService.getSubmittedClaims().subscribe({
       next: (claims) => {
@@ -37,7 +40,6 @@ export class Dashboard implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Failed to load claims.');
         this.loading.set(false);
       },
     });
@@ -46,7 +48,7 @@ export class Dashboard implements OnInit {
   loadSurveyors(): void {
     this.claimOfficerService.getSurveyors().subscribe({
       next: (surveyors) => this.surveyors.set(surveyors),
-      error: () => this.errorMessage.set('Failed to load surveyors.'),
+      error: () => {},
     });
   }
 
@@ -60,7 +62,7 @@ export class Dashboard implements OnInit {
   assignSurveyor(claim: ClaimResponse): void {
     const surveyorId = this.selectedSurveyor()[claim.id];
     if (!surveyorId) {
-      this.errorMessage.set('Please select a surveyor first.');
+      this.toastService.warning('Please select a surveyor first.');
       return;
     }
 
@@ -70,9 +72,9 @@ export class Dashboard implements OnInit {
       next: (updated) => {
         this.claims.update((list) => list.filter((c) => c.id !== updated.id));
         this.assigningId.set(null);
+        this.toastService.success('Surveyor assigned.');
       },
       error: () => {
-        this.errorMessage.set('Failed to assign surveyor.');
         this.assigningId.set(null);
       },
     });

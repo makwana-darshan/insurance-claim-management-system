@@ -1,10 +1,6 @@
 <div class="page">
   <h2>Admin Dashboard</h2>
 
-  @if (errorMessage()) {
-  <p class="error">{{ errorMessage() }}</p>
-  }
-
   @if (summary(); as s) {
   <div class="summary-cards">
     <div class="card">
@@ -34,15 +30,34 @@
   </div>
   }
 
-  <h3>All Claims</h3>
+  <div class="table-header">
+    <h3>All Claims</h3>
+
+    <div class="filters">
+      <input type="text" class="search-input" placeholder="Search by policy number or customer..."
+        [value]="searchTerm()" (input)="onSearchChange($any($event.target).value)" />
+
+      <select class="status-select" [value]="statusFilter()" (change)="onStatusFilterChange($any($event.target).value)">
+        @for (status of statusOptions; track status) {
+        <option [value]="status">{{ status === 'ALL' ? 'All Statuses' : status }}</option>
+        }
+      </select>
+    </div>
+  </div>
 
   @if (loading()) {
   <p>Loading claims...</p>
   }
 
   @if (!loading()) {
+  @if (filteredClaims().length === 0) {
   @if (claims().length === 0) {
-  <p class="empty">No claims found.</p>
+  <app-empty-state icon="📂" title="No claims in the system" message="Claims filed by customers will appear here.">
+  </app-empty-state>
+  } @else {
+  <app-empty-state icon="🔍" title="No matching claims" message="Try adjusting your search term or status filter.">
+  </app-empty-state>
+  }
   } @else {
   <table>
     <thead>
@@ -58,9 +73,11 @@
       </tr>
     </thead>
     <tbody>
-      @for (claim of claims(); track claim.id) {
+      @for (claim of filteredClaims(); track claim.id) {
       <tr>
-        <td>{{ claim.policyNumber }}</td>
+        <td>
+          <a [routerLink]="['/admin/claims', claim.id]" class="claim-link">{{ claim.policyNumber }}</a>
+        </td>
         <td>{{ claim.customerName }}</td>
         <td>{{ claim.claimType }}</td>
         <td>{{ claim.claimAmount | number:'1.2-2' }}</td>
@@ -77,6 +94,7 @@
           <span class="muted">—</span>
           }
         </td>
+
         <td class="actions">
           @if (claim.status === 'INSPECTED') {
           <button class="btn-approve" [disabled]="actingId() === claim.id" (click)="approve(claim)">

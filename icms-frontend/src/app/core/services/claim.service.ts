@@ -26,4 +26,16 @@ export class ClaimService {
   getTimeline(id: number): Observable<ClaimTimelineResponse> {
     return this.http.get<ClaimTimelineResponse>(`${this.claimsUrl}/${id}/timeline`);
   }
+
+  getClaim(id: number): Observable<ClaimResponse> {
+    return this.http.get<ClaimResponse>(`${this.baseUrl}/claims/${id}`);
+  }
+
+  updateClaim(id: number, request: ClaimRequest): Observable<ClaimResponse> {
+    return this.http.put<ClaimResponse>(`${this.baseUrl}/claims/${id}`, request);
+  }
+
+  cancelClaim(id: number, remarks?: string): Observable<ClaimResponse> {
+    return this.http.post<ClaimResponse>(`${this.baseUrl}/claims/${id}/cancel`, { remarks });
+  }
 }

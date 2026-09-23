@@ -6,8 +6,10 @@ import { ChangePassword } from './features/account/change-password/change-passwo
 import { Shell } from './core/layout/shell/shell';
 import { Dashboard as CustomerDashboard } from './features/customer/dashboard/dashboard';
 import { Dashboard as ClaimOfficerDashboard } from './features/claim-officer/dashboard/dashboard';
+import { ClaimDetail } from './features/admin/claim-detail/claim-detail';
 import { Users } from './features/admin/users/users';
 import { Dashboard as AdminDashboard } from './features/admin/dashboard/dashboard';
+import { Profile } from './features/account/profile/profile';
 import { Dashboard as SurveyorDashboard } from './features/surveyor/dashboard/dashboard';
 import { CreateClaim } from './features/customer/create-claim/create-claim';
 import { ClaimTimeline } from './features/customer/claim-timeline/claim-timeline';
@@ -75,6 +77,22 @@ export const routes: Routes = [
         component: Users,
         canActivate: [roleGuard],
         data: { role: 'SUPER_ADMIN' },
+      },
+      {
+        path: 'customer/claims/:id/edit',
+        component: CreateClaim,
+        canActivate: [roleGuard],
+        data: { role: 'CUSTOMER' },
+      },
+      {
+        path: 'admin/claims/:id',
+        component: ClaimDetail,
+        canActivate: [roleGuard],
+        data: { role: 'SUPER_ADMIN' },
+      },
+      {
+        path: 'account/profile',
+        component: Profile,
       },
       {
         path: 'account/change-password',

@@ -2,11 +2,12 @@ import { Component, OnInit, signal } from '@angular/core';
 import { DatePipe, DecimalPipe } from '@angular/common';
 import { SurveyorService } from '../../../core/services/surveyor.service';
 import { ClaimResponse } from '../../../core/models/claim.model';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-surveyor-dashboard',
   standalone: true,
-  imports: [DecimalPipe],
+  imports: [DecimalPipe,EmptyState],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })

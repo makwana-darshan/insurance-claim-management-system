@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -22,6 +23,7 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private titleService: Title,
+    private toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -37,8 +39,9 @@ export class LoginComponent implements OnInit {
     this.loading = true;
 
     this.authService.login({ email: this.email, password: this.password }).subscribe({
-      next: () => {
+      next: (response) => {
         this.loading = false;
+        this.toastService.success(`Welcome back, ${response.fullName}!`);
         const route = this.authService.getDefaultRouteForUser();
         this.router.navigate([route]);
       },

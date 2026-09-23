@@ -144,3 +144,47 @@ input[type="text"] {
 .error {
     color: #dc2626;
 }
+
+.table-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-header h3 {
+    margin: 0;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    width: 260px;
+}
+
+.status-select {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 13px;
+    background: white;
+}
+
+.claim-link {
+    color: #2563eb;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.claim-link:hover {
+    text-decoration: underline;
+}

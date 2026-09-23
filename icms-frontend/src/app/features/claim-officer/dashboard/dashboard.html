@@ -5,13 +5,12 @@
   <p>Loading claims...</p>
   }
 
-  @if (errorMessage()) {
-  <p class="error">{{ errorMessage() }}</p>
-  }
 
   @if (!loading()) {
   @if (claims().length === 0) {
-  <p class="empty">No submitted claims awaiting assignment.</p>
+  <app-empty-state icon="✅" title="All caught up"
+    message="There are no submitted claims waiting for surveyor assignment right now.">
+  </app-empty-state>
   } @else {
   <table>
     <thead>

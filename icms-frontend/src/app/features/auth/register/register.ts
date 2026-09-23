@@ -3,6 +3,7 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { AuthService } from '../../../core/services/auth.service';
+import { ToastService } from '../../../core/services/toast.service';
 
 @Component({
   selector: 'app-register',
@@ -24,6 +25,7 @@ export class Register {
     private authService: AuthService,
     private router: Router,
     private titleService: Title,
+    private toastService: ToastService,
   ) {
     this.titleService.setTitle('ICMS - Register');
   }
@@ -50,8 +52,9 @@ export class Register {
         password: this.password,
       })
       .subscribe({
-        next: () => {
+        next: (response) => {
           this.loading.set(false);
+          this.toastService.success(`Welcome, ${response.fullName}! Your account is ready.`);
           const route = this.authService.getDefaultRouteForUser();
           this.router.navigate([route]);
         },

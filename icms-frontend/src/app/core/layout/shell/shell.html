@@ -26,6 +26,9 @@
 
         @if (menuOpen()) {
         <div class="dropdown">
+          <a routerLink="/account/profile" class="dropdown-item" (click)="closeMenu()">
+            <span class="item-icon">👤</span> My Profile
+          </a>
           <a routerLink="/account/change-password" class="dropdown-item" (click)="closeMenu()">
             <span class="item-icon">🔒</span> Change Password
           </a>

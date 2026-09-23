@@ -5,7 +5,12 @@ export type ClaimStatus =
   | 'SURVEYOR_ASSIGNED'
   | 'INSPECTED'
   | 'APPROVED'
-  | 'REJECTED';
+  | 'REJECTED'
+  | 'CANCELLED';
+
+export interface CancelClaimRequest {
+  remarks?: string;
+}
 
 export interface ClaimRequest {
   policyNumber: string;

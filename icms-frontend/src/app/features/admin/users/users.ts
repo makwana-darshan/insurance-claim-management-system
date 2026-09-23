@@ -2,22 +2,25 @@ import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin.service';
 import { UserResponse } from '../../../core/models/admin.model';
+import { ToastService } from '../../../core/services/toast.service';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule,EmptyState,],
   templateUrl: './users.html',
   styleUrl: './users.css',
 })
 export class Users implements OnInit {
   users = signal<UserResponse[]>([]);
   loading = signal(true);
-  errorMessage = signal('');
 
   showForm = signal(false);
   creating = signal(false);
   formError = signal('');
+
+  togglingId = signal<number | null>(null);
 
   availableRoles = ['CLAIM_OFFICER', 'SURVEYOR', 'FINANCE_OFFICER', 'MEDICAL_REVIEWER'];
 
@@ -26,7 +29,10 @@ export class Users implements OnInit {
   password = '';
   role = '';
 
-  constructor(private adminService: AdminService) {}
+  constructor(
+    private adminService: AdminService,
+    private toastService: ToastService,
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -41,7 +47,6 @@ export class Users implements OnInit {
         this.loading.set(false);
       },
       error: () => {
-        this.errorMessage.set('Failed to load users.');
         this.loading.set(false);
       },
     });
@@ -83,11 +88,27 @@ export class Users implements OnInit {
           this.email = '';
           this.password = '';
           this.role = '';
+          this.toastService.success('User account created.');
         },
-        error: (err) => {
+        error: () => {
           this.creating.set(false);
-          this.formError.set(err.error?.error || 'Failed to create user.');
         },
       });
+  }
+
+  toggleStatus(user: UserResponse): void {
+    const newStatus = user.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    this.togglingId.set(user.id);
+
+    this.adminService.updateUserStatus(user.id, newStatus).subscribe({
+      next: (updated) => {
+        this.users.update((list) => list.map((u) => (u.id === updated.id ? updated : u)));
+        this.togglingId.set(null);
+        this.toastService.success('User status updated.');
+      },
+      error: () => {
+        this.togglingId.set(null);
+      },
+    });
   }
 }

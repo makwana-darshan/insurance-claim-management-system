@@ -1,5 +1,5 @@
 <div class="home">
-    <nav class="top-nav">
+    <nav class="top-nav" [class.scrolled]="scrolled()">
         <div class="brand">
             <span class="brand-icon">🛡️</span>
             <span class="brand-text">ICMS</span>
@@ -11,6 +11,7 @@
     </nav>
 
     <section class="hero">
+        <div class="hero-badge">Insurance Claim Management, Simplified</div>
         <h1>Insurance claims,<br />handled simply.</h1>
         <p class="hero-subtitle">
             File claims, track their progress, and get decisions faster —
@@ -20,6 +21,15 @@
             <a routerLink="/register" class="btn-primary large">Get Started</a>
             <a routerLink="/login" class="btn-ghost large">I already have an account</a>
         </div>
+    </section>
+
+    <section class="stats-bar">
+        @for (stat of stats; track stat.label) {
+        <div class="stat">
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+        </div>
+        }
     </section>
 
     <section class="features">
