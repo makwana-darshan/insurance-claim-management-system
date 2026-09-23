@@ -134,4 +134,26 @@ public class UserAccountService {
 		resetToken.setUsed(true);
 		resetTokenRepository.save(resetToken);
 	}
+
+	public User updateUserStatus(Long userId, UserStatus newStatus) {
+
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+		boolean isAdmin = user.getRoles().stream().anyMatch(role -> role.getRoleName().equals("SUPER_ADMIN"));
+
+		if (isAdmin) {
+			throw new RuntimeException("Admin accounts cannot be deactivated");
+		}
+
+		user.setStatus(newStatus);
+
+		return userRepository.save(user);
+	}
+
+	public User updateProfile(User user, String fullName) {
+
+		user.setFullName(fullName);
+
+		return userRepository.save(user);
+	}
 }
