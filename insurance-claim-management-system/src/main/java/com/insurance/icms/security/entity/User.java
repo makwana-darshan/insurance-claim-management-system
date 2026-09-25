@@ -16,6 +16,9 @@ public class User {
 	@Column(unique = true, nullable = false)
 	private String email;
 
+	@Column(nullable = false)
+	private boolean emailVerified = false;
+
 	private String password;
 
 	@Enumerated(EnumType.STRING)
@@ -70,4 +73,11 @@ public class User {
 		this.status = status;
 	}
 
+	public boolean isEmailVerified() {
+		return emailVerified;
+	}
+
+	public void setEmailVerified(boolean emailVerified) {
+		this.emailVerified = emailVerified;
+	}
 }

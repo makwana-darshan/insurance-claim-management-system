@@ -1,7 +1,6 @@
 package com.insurance.icms.security.controller;
 
 import com.insurance.icms.security.dto.*;
-import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.jwt.JwtService;
 import com.insurance.icms.security.service.CustomUserDetails;
 import com.insurance.icms.security.service.UserAccountService;
@@ -48,17 +47,19 @@ public class AuthController {
 	}
 
 	@PostMapping("/register")
-	public LoginResponse register(@Valid @RequestBody RegisterRequest request) {
+	public Map<String, String> register(@Valid @RequestBody RegisterRequest request) {
 
-		User user = userAccountService.registerCustomer(request);
+		userAccountService.registerCustomer(request);
 
-		CustomUserDetails userDetails = new CustomUserDetails(user);
-		String token = jwtService.generateToken(userDetails);
+		return Map.of("message", "Account created. Please check your email to verify your account before logging in.");
+	}
 
-		List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-				.collect(Collectors.toList());
+	@PostMapping("/verify-email")
+	public Map<String, String> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
 
-		return new LoginResponse(token, user.getEmail(), user.getFullName(), roles);
+		userAccountService.verifyEmail(request.getToken());
+
+		return Map.of("message", "Email verified successfully. You can now log in.");
 	}
 
 	@PostMapping("/forgot-password")

@@ -2,15 +2,18 @@ package com.insurance.icms.security.service;
 
 import com.insurance.icms.security.dto.CreateUserRequest;
 import com.insurance.icms.security.dto.RegisterRequest;
+import com.insurance.icms.security.entity.EmailVerificationToken;
 import com.insurance.icms.security.entity.PasswordResetToken;
 import com.insurance.icms.security.entity.Role;
 import com.insurance.icms.security.entity.User;
 import com.insurance.icms.security.entity.UserStatus;
+import com.insurance.icms.security.repository.EmailVerificationTokenRepository;
 import com.insurance.icms.security.repository.PasswordResetTokenRepository;
 import com.insurance.icms.security.repository.RoleRepository;
 import com.insurance.icms.security.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,18 +30,21 @@ public class UserAccountService {
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final PasswordResetTokenRepository resetTokenRepository;
+	private final EmailVerificationTokenRepository verificationTokenRepository;
 	private final EmailService emailService;
 
 	public UserAccountService(UserRepository userRepository, RoleRepository roleRepository,
 			PasswordEncoder passwordEncoder, PasswordResetTokenRepository resetTokenRepository,
-			EmailService emailService) {
+			EmailVerificationTokenRepository verificationTokenRepository, EmailService emailService) {
 		this.userRepository = userRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.resetTokenRepository = resetTokenRepository;
+		this.verificationTokenRepository = verificationTokenRepository;
 		this.emailService = emailService;
 	}
 
+	@Transactional
 	public User registerCustomer(RegisterRequest request) {
 
 		if (userRepository.findByEmail(request.getEmail()).isPresent()) {
@@ -53,9 +59,50 @@ public class UserAccountService {
 		user.setEmail(request.getEmail());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		user.setStatus(UserStatus.ACTIVE);
+		user.setEmailVerified(false);
 		user.setRoles(Set.of(customerRole));
 
-		return userRepository.save(user);
+		User savedUser = userRepository.save(user);
+
+		sendVerificationEmail(savedUser);
+
+		return savedUser;
+	}
+
+	private void sendVerificationEmail(User user) {
+
+		String token = UUID.randomUUID().toString();
+
+		EmailVerificationToken verificationToken = new EmailVerificationToken();
+		verificationToken.setToken(token);
+		verificationToken.setUser(user);
+		verificationToken.setExpiresAt(LocalDateTime.now().plusHours(24));
+
+		verificationTokenRepository.save(verificationToken);
+
+		emailService.sendVerificationEmail(user.getEmail(), user.getFullName(), token);
+	}
+
+	@Transactional
+	public void verifyEmail(String token) {
+
+		EmailVerificationToken verificationToken = verificationTokenRepository.findByToken(token)
+				.orElseThrow(() -> new RuntimeException("Invalid or expired verification link"));
+
+		if (verificationToken.isUsed()) {
+			throw new RuntimeException("This verification link has already been used");
+		}
+
+		if (verificationToken.getExpiresAt().isBefore(LocalDateTime.now())) {
+			throw new RuntimeException("This verification link has expired");
+		}
+
+		User user = verificationToken.getUser();
+		user.setEmailVerified(true);
+		userRepository.save(user);
+
+		verificationToken.setUsed(true);
+		verificationTokenRepository.save(verificationToken);
 	}
 
 	public void changePassword(User user, String currentPassword, String newPassword) {
@@ -68,6 +115,7 @@ public class UserAccountService {
 		userRepository.save(user);
 	}
 
+	@Transactional
 	public User createStaffUser(CreateUserRequest request) {
 
 		if (!ASSIGNABLE_STAFF_ROLES.contains(request.getRole())) {
@@ -86,15 +134,36 @@ public class UserAccountService {
 		user.setEmail(request.getEmail());
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		user.setStatus(UserStatus.ACTIVE);
+		user.setEmailVerified(true);
 		user.setRoles(Set.of(role));
 
 		return userRepository.save(user);
 	}
 
-	public List<User> getAllUsers() {
-		return userRepository.findAll();
+	@Transactional
+	public User updateUserStatus(Long userId, UserStatus newStatus) {
+
+		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+		boolean isAdmin = user.getRoles().stream().anyMatch(role -> role.getRoleName().equals("SUPER_ADMIN"));
+
+		if (isAdmin) {
+			throw new RuntimeException("Admin accounts cannot be deactivated");
+		}
+
+		user.setStatus(newStatus);
+
+		return userRepository.save(user);
 	}
 
+	public User updateProfile(User user, String fullName) {
+
+		user.setFullName(fullName);
+
+		return userRepository.save(user);
+	}
+
+	@Transactional
 	public void requestPasswordReset(String email) {
 
 		userRepository.findByEmail(email).ifPresent(user -> {
@@ -110,10 +179,9 @@ public class UserAccountService {
 
 			emailService.sendPasswordResetEmail(user.getEmail(), token);
 		});
-
-		// Intentionally no else/exception here -- see note below
 	}
 
+	@Transactional
 	public void resetPassword(String token, String newPassword) {
 
 		PasswordResetToken resetToken = resetTokenRepository.findByToken(token)
@@ -135,25 +203,7 @@ public class UserAccountService {
 		resetTokenRepository.save(resetToken);
 	}
 
-	public User updateUserStatus(Long userId, UserStatus newStatus) {
-
-		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-		boolean isAdmin = user.getRoles().stream().anyMatch(role -> role.getRoleName().equals("SUPER_ADMIN"));
-
-		if (isAdmin) {
-			throw new RuntimeException("Admin accounts cannot be deactivated");
-		}
-
-		user.setStatus(newStatus);
-
-		return userRepository.save(user);
-	}
-
-	public User updateProfile(User user, String fullName) {
-
-		user.setFullName(fullName);
-
-		return userRepository.save(user);
+	public List<User> getAllUsers() {
+		return userRepository.findAll();
 	}
 }

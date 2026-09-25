@@ -39,7 +39,8 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<Map<String, String>> handleDisabledAccount(DisabledException ex) {
 
 		Map<String, String> error = new HashMap<>();
-		error.put("error", "This account is inactive. Please contact an administrator.");
+		error.put("error",
+				"Your account is inactive or your email is not yet verified. Please check your inbox or contact an administrator.");
 
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	}
@@ -61,4 +62,5 @@ public class GlobalExceptionHandler {
 
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
 	}
+
 }

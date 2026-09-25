@@ -32,4 +32,20 @@ public class EmailService {
 
 		mailSender.send(message);
 	}
+
+	@Async
+	public void sendVerificationEmail(String toEmail, String fullName, String token) {
+
+		String verifyLink = frontendUrl + "/verify-email?token=" + token;
+
+		SimpleMailMessage message = new SimpleMailMessage();
+		message.setTo(toEmail);
+		message.setSubject("ICMS - Verify Your Email");
+		message.setText("Hi " + fullName + ",\n\n"
+				+ "Welcome to ICMS! Please verify your email address to activate your account:\n\n" + verifyLink
+				+ "\n\n" + "This link is valid for 24 hours.\n\n"
+				+ "If you didn't create this account, you can safely ignore this email.");
+
+		mailSender.send(message);
+	}
 }
