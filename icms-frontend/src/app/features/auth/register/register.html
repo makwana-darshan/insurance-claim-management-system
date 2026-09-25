@@ -12,6 +12,8 @@
 
   <div class="center-content">
     <div class="register-box">
+
+      @if (!submitted()) {
       <h2>Create Account</h2>
       <p class="subtitle">Sign up to file and track your insurance claims</p>
 
@@ -48,6 +50,18 @@
       <p class="login-link">
         Already have an account? <a routerLink="/login">Log in</a>
       </p>
+      } @else {
+      <div class="success-icon">📧</div>
+      <h2>Check Your Email</h2>
+      <p class="subtitle">
+        We've sent a verification link to <strong>{{ email }}</strong>.
+        Please click it to activate your account before logging in.
+      </p>
+      <p class="login-link">
+        <a routerLink="/login">← Back to Login</a>
+      </p>
+      }
+
     </div>
   </div>
 </div>

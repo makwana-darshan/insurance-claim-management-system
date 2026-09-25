@@ -1,0 +1,29 @@
+<div class="wrapper">
+    <nav class="top-nav">
+        <a routerLink="/" class="brand">
+            <span class="brand-icon">🛡️</span>
+            <span class="brand-text">ICMS</span>
+        </a>
+    </nav>
+
+    <div class="center-content">
+        <div class="box">
+
+            @if (status() === 'verifying') {
+            <h2>Verifying...</h2>
+            <p class="subtitle">Please wait while we verify your email.</p>
+            } @else if (status() === 'success') {
+            <div class="icon">✅</div>
+            <h2>Email Verified</h2>
+            <p class="subtitle">Your account is now active. You can log in.</p>
+            <a routerLink="/login" class="btn-primary-link">Go to Login</a>
+            } @else {
+            <div class="icon">⚠️</div>
+            <h2>Verification Failed</h2>
+            <p class="subtitle">{{ errorMessage() }}</p>
+            <a routerLink="/login" class="btn-primary-link">Back to Login</a>
+            }
+
+        </div>
+    </div>
+</div>

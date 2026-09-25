@@ -12,6 +12,7 @@ import { Dashboard as AdminDashboard } from './features/admin/dashboard/dashboar
 import { Profile } from './features/account/profile/profile';
 import { Dashboard as SurveyorDashboard } from './features/surveyor/dashboard/dashboard';
 import { CreateClaim } from './features/customer/create-claim/create-claim';
+import { VerifyEmail } from './features/auth/verify-email/verify-email';
 import { ClaimTimeline } from './features/customer/claim-timeline/claim-timeline';
 import { roleGuard } from './core/guards/role.guard';
 import { authGuard } from './core/guards/auth.guard';
@@ -25,6 +26,7 @@ export const routes: Routes = [
   { path: 'register', component: Register },
   { path: 'forgot-password', component: ForgotPassword },
   { path: 'reset-password', component: ResetPassword },
+  { path: 'verify-email', component: VerifyEmail },
 
   {
     path: '',

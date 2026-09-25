@@ -9,6 +9,7 @@ import {
   RegisterRequest,
   ForgotPasswordRequest,
   ResetPasswordRequest,
+  VerifyEmailRequest,
 } from '../models/auth.model';
 import { ToastService } from './toast.service';
 
@@ -29,10 +30,12 @@ export class AuthService {
       .pipe(tap((response) => this.storeSession(response)));
   }
 
-  register(request: RegisterRequest): Observable<LoginResponse> {
-    return this.http
-      .post<LoginResponse>(`${environment.apiUrl}/auth/register`, request)
-      .pipe(tap((response) => this.storeSession(response)));
+  register(request: RegisterRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/register`, request);
+  }
+
+  verifyEmail(request: VerifyEmailRequest): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${environment.apiUrl}/auth/verify-email`, request);
   }
 
   forgotPassword(request: ForgotPasswordRequest): Observable<{ message: string }> {
