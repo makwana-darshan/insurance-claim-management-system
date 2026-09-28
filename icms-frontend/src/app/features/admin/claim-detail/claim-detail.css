@@ -217,3 +217,24 @@
 .error {
     color: #dc2626;
 }
+
+@media (max-width: 700px) {
+    .detail-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .header-top {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .decision-actions {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+}

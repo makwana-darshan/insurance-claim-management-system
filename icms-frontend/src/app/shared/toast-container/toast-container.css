@@ -72,3 +72,12 @@
         transform: translateX(0);
     }
 }
+
+@media (max-width: 600px) {
+    .toast-stack {
+        left: 12px;
+        right: 12px;
+        top: 12px;
+        max-width: none;
+    }
+}

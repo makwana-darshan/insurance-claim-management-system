@@ -188,3 +188,25 @@ input[type="text"] {
 .claim-link:hover {
     text-decoration: underline;
 }
+
+@media (max-width: 900px) {
+    .summary-cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .filters {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .search-input,
+    .status-select {
+        width: 100%;
+    }
+}

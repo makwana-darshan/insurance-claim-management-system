@@ -158,3 +158,14 @@ th {
   color: #94a3b8;
   font-size: 13px;
 }
+
+@media (max-width: 600px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+}

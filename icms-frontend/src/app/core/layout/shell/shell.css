@@ -191,3 +191,49 @@
   padding: 28px;
   background: #f8fafc;
 }
+
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    row-gap: 8px;
+  }
+
+  .navbar-left {
+    display: contents;
+  }
+
+  .brand {
+    order: 1;
+  }
+
+  .navbar-right {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .nav-links {
+    order: 3;
+    width: 100%;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .nav-link {
+    white-space: nowrap;
+    padding: 6px 12px;
+  }
+
+  .content {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+
+  .user-text,
+  .chevron {
+    display: none;
+  }
+}

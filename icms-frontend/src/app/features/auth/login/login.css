@@ -68,7 +68,8 @@
   background: white;
   padding: 32px;
   border-radius: 12px;
-  width: 380px;
+  width: 100%;
+  max-width: 380px;
 }
 
 .field {
@@ -130,4 +131,14 @@ button:disabled {
 .forgot-link a {
   color: #2563eb;
   text-decoration: none;
+}
+
+@media (max-width: 600px) {
+  .top-nav {
+    padding: 14px 16px;
+  }
+
+  .nav-text {
+    display: none;
+  }
 }
