@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -11,7 +11,7 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './register.html',
   styleUrl: './register.css',
 })
-export class Register {
+export class Register implements OnDestroy {
   fullName = '';
   email = '';
   password = '';
@@ -21,11 +21,49 @@ export class Register {
   loading = signal(false);
   submitted = signal(false);
 
+  showPassword = signal(false);
+  showConfirmPassword = signal(false);
+  passwordMatchMessage = signal<'match' | 'mismatch' | null>(null);
+  private passwordMatchTimeout?: ReturnType<typeof setTimeout>;
+
   constructor(
     private authService: AuthService,
     private titleService: Title,
   ) {
     this.titleService.setTitle('ICMS - Register');
+  }
+
+  togglePassword(): void {
+    this.showPassword.update((v) => !v);
+  }
+
+  toggleConfirmPassword(): void {
+    this.showConfirmPassword.update((v) => !v);
+  }
+
+  onPasswordsChanged(): void {
+    clearTimeout(this.passwordMatchTimeout);
+
+    if (!this.password || !this.confirmPassword) {
+      this.passwordMatchMessage.set(null);
+      return;
+    }
+
+    this.passwordMatchMessage.set(
+      this.password === this.confirmPassword ? 'match' : 'mismatch',
+    );
+    this.passwordMatchTimeout = setTimeout(() => {
+      this.passwordMatchMessage.set(null);
+      this.passwordMatchTimeout = undefined;
+    }, 3500);
+  }
+
+  passwordsMismatch(): boolean {
+    return !!this.password && !!this.confirmPassword && this.password !== this.confirmPassword;
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.passwordMatchTimeout);
   }
 
   onSubmit(): void {

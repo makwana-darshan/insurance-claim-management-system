@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -18,6 +18,8 @@ export class LoginComponent implements OnInit {
   errorMessage = '';
   loading = false;
 
+  showPassword = signal(false);
+
   constructor(
     private authService: AuthService,
     private router: Router,
@@ -32,6 +34,10 @@ export class LoginComponent implements OnInit {
     if (this.route.snapshot.queryParamMap.get('sessionExpired') === 'true') {
       this.errorMessage = 'Your session has expired. Please log in again.';
     }
+  }
+
+  togglePassword(): void {
+    this.showPassword.update((v) => !v);
   }
 
   onSubmit(): void {
